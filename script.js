@@ -31,7 +31,11 @@ window.addEventListener("keydown", (event) => {
 });
 
 window.addEventListener("pointerdown", (event) => {
-  if (event.target?.dataset?.mode) {
+  const modeButton =
+    event.target?.closest?.("[data-mode]") ??
+    event.target?.parentElement?.closest?.("[data-mode]");
+
+  if (modeButton) {
     return;
   }
 
