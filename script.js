@@ -25,7 +25,12 @@ modeButtons.forEach((button) => {
 });
 
 window.addEventListener("keydown", (event) => {
-  if (event.key.length !== 1 && !event.key.startsWith("Arrow")) {
+  if (
+    event.ctrlKey ||
+    event.metaKey ||
+    event.altKey ||
+    (event.key.length !== 1 && !event.key.startsWith("Arrow"))
+  ) {
     return;
   }
 
