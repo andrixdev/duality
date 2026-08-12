@@ -6,6 +6,12 @@
 
 let mode = 1 // 1 to 5
 
+let cycleMode = (step) => {
+  const modes = 5
+  mode = ((mode - 1 + step + modes) % modes) + 1
+  start()
+}
+
 // Common base for exposed parameters
 const baseParams = {
   gridDimension: 80, // dim - Ready for some CPU sweat?
@@ -855,6 +861,9 @@ class UI {
 
     this.injectAlongPath(prevX, prevY, nextX, nextY)
   }
+  adjustActivePanel (way) {
+    this.updatePanel(way)
+  }
   initInteractions () {
     // Mouse motion on grid
     let lastX, lastY
@@ -904,7 +913,7 @@ class UI {
       else if (ev.code == "ArrowUp" || ev.code == "ArrowDown") {
         ev.preventDefault()
         let way = ev.code == "ArrowUp" ? "up" : "down"
-        this.updatePanel(way)
+        this.adjustActivePanel(way)
       }
     })
 
@@ -914,17 +923,16 @@ class UI {
     this.gamepad.setLeftJoystickHandler((xAxis, yAxis, deadzone) => {
       this.updateVirtualPointer(xAxis, yAxis, deadzone)
     })
+    this.gamepad.setDpadVerticalHandler((way) => {
+      this.adjustActivePanel(way)
+    })
     
     // Mode toggle
-    let modes = 5
     window.addEventListener("keyup", ev => {
       if (ev.code == "KeyQ") {
-        mode = mode - 2
-        mode = 1 + (modes + mode) % modes
-        start()
+        cycleMode(-1)
       } else if (ev.code == "KeyW") {
-        mode = 1 + (modes + mode) % modes
-        start()
+        cycleMode(1)
       }
     })
   }
@@ -1332,6 +1340,8 @@ class Gamepad {
     this.isLoopRunning = false
     this.onInteraction = null
     this.onLeftJoystick = null
+    this.onDpadVertical = null
+    this.buttonPressedState = {}
     this.initConnectionListeners()
   }
   setInteractionHandler(handler) {
@@ -1339,6 +1349,9 @@ class Gamepad {
   }
   setLeftJoystickHandler(handler) {
     this.onLeftJoystick = handler
+  }
+  setDpadVerticalHandler(handler) {
+    this.onDpadVertical = handler
   }
   notifyInteraction() {
     if (this.onInteraction) {
@@ -1350,6 +1363,22 @@ class Gamepad {
       this.onLeftJoystick(xAxis, yAxis, deadzone)
     }
   }
+  notifyDpadVertical(way) {
+    if (this.onDpadVertical) {
+      this.onDpadVertical(way)
+    }
+  }
+  resetButtonStates(gamepadIndex) {
+    for (let buttonIndex = 0; buttonIndex <= 16; buttonIndex++) {
+      delete this.buttonPressedState[`${gamepadIndex}:${buttonIndex}`]
+    }
+  }
+  isNewButtonPress(gamepadIndex, buttonIndex, isPressed) {
+    const key = `${gamepadIndex}:${buttonIndex}`
+    const wasPressed = this.buttonPressedState[key] === true
+    this.buttonPressedState[key] = isPressed
+    return isPressed && !wasPressed
+  }
   initConnectionListeners() {
     // Detect plug
     window.addEventListener("gamepadconnected", (event) => {
@@ -1357,6 +1386,7 @@ class Gamepad {
 
       // Store the gamepad reference in our global object
       this.activeGamepads[event.gamepad.index] = event.gamepad
+      this.resetButtonStates(event.gamepad.index)
       this.startGamepadLoop()
     })
 
@@ -1366,6 +1396,7 @@ class Gamepad {
 
       // Remove the device from our tracking object
       delete this.activeGamepads[event.gamepad.index]
+      this.resetButtonStates(event.gamepad.index)
     })
   }
   startGamepadLoop() {
@@ -1512,23 +1543,43 @@ class Gamepad {
     }
 
     if (dpadUp?.pressed) {
-      console.log("JS object: dpadUp")
+      if (this.isNewButtonPress(gamepad.index, 12, true)) {
+        console.log("JS object: dpadUp")
+        this.notifyDpadVertical("up")
+      }
       // Action for D-pad up
+    } else {
+      this.isNewButtonPress(gamepad.index, 12, false)
     }
 
     if (dpadDown?.pressed) {
-      console.log("JS object: dpadDown")
+      if (this.isNewButtonPress(gamepad.index, 13, true)) {
+        console.log("JS object: dpadDown")
+        this.notifyDpadVertical("down")
+      }
       // Action for D-pad down
+    } else {
+      this.isNewButtonPress(gamepad.index, 13, false)
     }
 
     if (dpadLeft?.pressed) {
       console.log("JS object: dpadLeft")
+      if (this.isNewButtonPress(gamepad.index, 14, true)) {
+        cycleMode(-1)
+      }
       // Action for D-pad left
+    } else {
+      this.isNewButtonPress(gamepad.index, 14, false)
     }
 
     if (dpadRight?.pressed) {
       console.log("JS object: dpadRight")
+      if (this.isNewButtonPress(gamepad.index, 15, true)) {
+        cycleMode(1)
+      }
       // Action for D-pad right
+    } else {
+      this.isNewButtonPress(gamepad.index, 15, false)
     }
 
     if (guideButton?.pressed) {
