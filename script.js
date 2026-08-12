@@ -823,10 +823,13 @@ class UI {
     this.panel0value = this.panels[0].querySelector("p.value")
     this.panel1name = this.panels[1].querySelector("p.name")
     this.panel1value = this.panels[1].querySelector("p.value")
+    this.deltaTmsReadout = document.getElementById("delta-tms")
+    this.deltaTmsValue = this.deltaTmsReadout ? this.deltaTmsReadout.querySelector(".value") : null
     this.audioHasBooted = false
     this.virtualPointer = { x: size / 2, y: size / 2 }
     this.gamepad = gamepad
     this.updatePanelsMode(baseParams.modeName)
+    this.updateDeltaTms()
     this.initInteractions()
   }
   bootAudio () {
@@ -942,6 +945,10 @@ class UI {
         cycleMode(1)
       }
     })
+  }
+  updateDeltaTms() {
+    if (!this.deltaTmsValue) return
+    this.deltaTmsValue.textContent = `${deltaTms.toFixed(1)} ms`
   }
   updatePanelsMode(modeName) {
     if (modeName == "base") {
@@ -1767,6 +1774,7 @@ let update = () => {
   // Capture deltaTms (2/2)
   let now2 = performance.now()
   deltaTms = now2 - now1
+  ui.updateDeltaTms()
 }
 
 // Boot
