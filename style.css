@@ -92,7 +92,11 @@ button:hover,
 button:focus-visible {
   background: #24345f;
   transform: translateY(-1px);
-  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid #cdd8ff;
+  outline-offset: 3px;
 }
 
 button.is-active {
