@@ -810,10 +810,6 @@ class Particle {
 }
 class UI {
   constructor (gamepad) {
-    this.controlsNode = document.getElementById("controls")
-    this.footerNode = document.getElementsByTagName("footer")[0]
-    this.controlButtonsNode = document.getElementById("ctrl-buttons")
-    this.isActive = false
     this.panelIndex = 0
     this.panels = document.querySelectorAll(".control-panel")
     this.nb = this.panels.length
@@ -822,9 +818,15 @@ class UI {
     this.panel1name = this.panels[1].querySelector("p.name")
     this.panel1value = this.panels[1].querySelector("p.value")
     this.audioHasBooted = false
+    this.gamepad = gamepad
     this.updatePanelsMode(baseParams.modeName)
     this.initInteractions()
-    this.gamepad = gamepad
+  }
+  bootAudio () {
+    if (!this.audioHasBooted) {
+      audio = new Explaudio()
+      this.audioHasBooted = true
+    }
   }
   initInteractions () {
     // Mouse motion on grid
@@ -842,28 +844,16 @@ class UI {
       lastY = y
     })
 
-    // Controls toggle (space bar)
     window.addEventListener("keydown", ev => {
-      if (ev.code == "Space") {
+      this.bootAudio()
+
+      if (ev.code == "ArrowLeft" || ev.code == "ArrowRight" || ev.code == "ArrowUp" || ev.code == "ArrowDown") {
         ev.preventDefault()
       }
     })
     window.addEventListener("keyup", ev => {
-      // Space -> toggle controls
-      if (ev.code == "Space") {
-        this.footerNode.classList = "hidden"
-        this.isActive = !this.isActive
-        this.controlsNode.classList.toggle("visible")
-        
-        // Audio boot
-        if (!this.audioHasBooted) {
-          audio = new Explaudio()
-          this.audioHasBooted = true
-        }
-        
-      }
       // Left Arrow -> previous panel
-      else if (ev.code == "ArrowLeft" && this.isActive) {
+      if (ev.code == "ArrowLeft") {
         ev.preventDefault()
         // Change panel index
         this.panelIndex = (this.panelIndex + 2 * this.nb - 1) % this.nb
@@ -875,7 +865,7 @@ class UI {
         })
       }
       // Right Arrow -> next panel
-      else if (ev.code == "ArrowRight" && this.isActive) {
+      else if (ev.code == "ArrowRight") {
         ev.preventDefault()
         // Change panel index
         this.panelIndex = (this.panelIndex + 2 * this.nb + 1) % this.nb
@@ -888,24 +878,15 @@ class UI {
       }
       // Up arrow -> increase current active variable
       // Down arrow -> decrease current active variable
-      else if ((ev.code == "ArrowUp" || ev.code == "ArrowDown") && this.isActive) {
+      else if (ev.code == "ArrowUp" || ev.code == "ArrowDown") {
         ev.preventDefault()
         let way = ev.code == "ArrowUp" ? "up" : "down"
         this.updatePanel(way)
       }
     })
-    
-    // Audio boot (on first space bar)
-    window.addEventListener("keydown", ev => {
-      if (ev.code == "Space") {
-        ev.preventDefault()
-      }
-    })
-    
-    // Gamepad boot (buttons)
-    this.controlButtonsNode.addEventListener("click", () => {
-      // Start the high-speed polling loop
-      this.gamepad.startGamepadLoop()
+
+    this.gamepad.setInteractionHandler(() => {
+      this.bootAudio()
     })
     
     // Mode toggle
@@ -1323,7 +1304,16 @@ class Gamepad {
   constructor() {
     this.activeGamepads = {}
     this.isLoopRunning = false
+    this.onInteraction = null
     this.initConnectionListeners()
+  }
+  setInteractionHandler(handler) {
+    this.onInteraction = handler
+  }
+  notifyInteraction() {
+    if (this.onInteraction) {
+      this.onInteraction()
+    }
   }
   initConnectionListeners() {
     // Detect plug
@@ -1332,6 +1322,7 @@ class Gamepad {
 
       // Store the gamepad reference in our global object
       this.activeGamepads[event.gamepad.index] = event.gamepad
+      this.startGamepadLoop()
     })
 
     // Detect unplug
@@ -1372,33 +1363,176 @@ class Gamepad {
     
   }
   readButtons(gamepad) {
-    // Mapping "standard": Index 0 is typically the bottom action button (Xbox A / PS X)
-    const primaryButton = gamepad.buttons[0]
+    let hasButtonInteraction = false
+
+    gamepad.buttons.forEach(button => {
+      if (button.pressed || button.value > 0.1) {
+        hasButtonInteraction = true
+      }
+    })
+
+    if (hasButtonInteraction) {
+      this.notifyInteraction()
+    }
+
+    // Standard gamepad mapping reference:
+    // 0  A / Cross
+    // 1  B / Circle
+    // 2  X / Square
+    // 3  Y / Triangle
+    // 4  Left bumper (LB)
+    // 5  Right bumper (RB)
+    // 6  Left trigger (LT)
+    // 7  Right trigger (RT)
+    // 8  Back / Select
+    // 9  Start
+    // 10 Left stick press (L3)
+    // 11 Right stick press (R3)
+    // 12 D-pad up
+    // 13 D-pad down
+    // 14 D-pad left
+    // 15 D-pad right
+    // 16 Guide / Home button (browser support varies)
+    const [
+      primaryButton,
+      buttonB,
+      buttonX,
+      buttonY,
+      leftBumper,
+      rightBumper,
+      leftTrigger,
+      rightTrigger,
+      backButton,
+      startButton,
+      leftStickPress,
+      rightStickPress,
+      dpadUp,
+      dpadDown,
+      dpadLeft,
+      dpadRight,
+      guideButton
+    ] = gamepad.buttons
 
     if (primaryButton.pressed) {
       console.log(`Button 0 is actively held down! Pressure: ${primaryButton.value}`)
+      console.log("JS object: primaryButton (A / Cross)")
+      // Action for A / Cross
+    }
+
+    if (buttonB?.pressed) {
+      console.log("JS object: buttonB (B / Circle)")
+      // Action for B / Circle
+    }
+
+    if (buttonX?.pressed) {
+      console.log("JS object: buttonX (X / Square)")
+      // Action for X / Square
+    }
+
+    if (buttonY?.pressed) {
+      console.log("JS object: buttonY (Y / Triangle)")
+      // Action for Y / Triangle
+    }
+
+    if (leftBumper?.pressed) {
+      console.log("JS object: leftBumper (LB)")
+      // Action for left bumper
     }
 
     // Index 6 and 7 are traditionally Left and Right analog triggers
-    const leftTrigger = gamepad.buttons[6]
     if (leftTrigger.value > 0.1) {
       console.log(`Left trigger depressed to: ${leftTrigger.value * 100}%`)
+      console.log("JS object: leftTrigger (LT)")
+      // Action for left trigger
+    }
+
+    if ((rightTrigger?.value ?? 0) > 0.1) {
+      console.log("JS object: rightTrigger (RT)")
+      // Action for right trigger
+    }
+
+    if (rightBumper?.pressed) {
+      console.log("JS object: rightBumper (RB)")
+      // Action for right bumper
+    }
+
+    if (backButton?.pressed) {
+      console.log("JS object: backButton (Back / Select)")
+      // Action for Back / Select
+    }
+
+    if (startButton?.pressed) {
+      console.log("JS object: startButton (Start)")
+      // Action for Start
+    }
+
+    if (leftStickPress?.pressed) {
+      console.log("JS object: leftStickPress (L3)")
+      // Action for left stick press
+    }
+
+    if (rightStickPress?.pressed) {
+      console.log("JS object: rightStickPress (R3)")
+      // Action for right stick press
+    }
+
+    if (dpadUp?.pressed) {
+      console.log("JS object: dpadUp")
+      // Action for D-pad up
+    }
+
+    if (dpadDown?.pressed) {
+      console.log("JS object: dpadDown")
+      // Action for D-pad down
+    }
+
+    if (dpadLeft?.pressed) {
+      console.log("JS object: dpadLeft")
+      // Action for D-pad left
+    }
+
+    if (dpadRight?.pressed) {
+      console.log("JS object: dpadRight")
+      // Action for D-pad right
+    }
+
+    if (guideButton?.pressed) {
+      console.log("JS object: guideButton (Guide / Home)")
+      // Action for Guide / Home
     }
   }
   readJoysticks(gamepad) {
     // Index 0 & 1 govern the Horizontal and Vertical axes of the LEFT joystick
-    let xAxis = gamepad.axes[0]
-    let yAxis = gamepad.axes[1]
+    let leftXAxis = gamepad.axes[0]
+    let leftYAxis = gamepad.axes[1]
+
+    // Index 2 & 3 govern the Horizontal and Vertical axes of the RIGHT joystick
+    let rightXAxis = gamepad.axes[2]
+    let rightYAxis = gamepad.axes[3]
 
     const DEADZONE = 0.15 // Ignore any microscopic hardware vibrations below 15%
 
-    if (Math.abs(xAxis) > DEADZONE) {
-      console.log(`Joystick tilted horizontally: ${xAxis}`)
+    let hasAxisInteraction = gamepad.axes.some(axis => Math.abs(axis) > DEADZONE)
+    if (hasAxisInteraction) {
+      this.notifyInteraction()
+    }
+
+    if (Math.abs(leftXAxis) > DEADZONE) {
+      console.log(`Left joystick tilted horizontally: ${leftXAxis}`)
       // Execute page navigation, character movement, etc.
     }
 
-    if (Math.abs(yAxis) > DEADZONE) {
-      console.log(`Joystick tilted vertically: ${yAxis}`)
+    if (Math.abs(leftYAxis) > DEADZONE) {
+      console.log(`Left joystick tilted vertically: ${leftYAxis}`)
+    }
+
+    if (Math.abs(rightXAxis) > DEADZONE) {
+      console.log(`Right joystick tilted horizontally: ${rightXAxis}`)
+      // Execute page navigation, character movement, etc.
+    }
+
+    if (Math.abs(rightYAxis) > DEADZONE) {
+      console.log(`Right joystick tilted vertically: ${rightYAxis}`)
     }
   }
 }

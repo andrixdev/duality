@@ -41,39 +41,6 @@ canvas {
 #can-2 {
   z-index: 2;
 }
-#ctrl-buttons {
-  position: absolute;
-  margin: auto;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 200px;
-  height: 200px;
-  z-index: 3;
-  
-  p {
-    text-align: center;
-    
-    button {
-      position: relative;
-      color: white;
-      border: none;
-      padding: 1em;
-      font-size: 1.125rem;
-      cursor: pointer;
-      text-transform: uppercase;
-      background: #000D;
-      box-shadow: 0 0 7px #FFFA;
-      border-radius: 3px;
-      
-      &:hover {
-        text-shadow: 0 0 5px white;
-        box-shadow: 0 0 10px white;
-      }
-    }
-  }
-}
 #controls {
   pointer-events: none;
   --wid: 200px;
@@ -91,11 +58,6 @@ canvas {
   overflow: hidden;
   display: flex;
   flex-flow: row;
-  display: none;
-  
-  &.visible {
-    display: flex;
-  }
   
   .control-panel {
     min-width: var(--wid);
@@ -119,26 +81,5 @@ canvas {
         }
       }
     }
-  }
-}
-footer {
-  pointer-events: none;
-  position: fixed;
-  bottom: 0;
-  opacity: 0.75;
-  font-size: .75em;
-  text-align: center;
-  font-style: italic;
-  width: 100%;
-  z-index: 5;
-  line-height: .5em;
-  
-  &.hidden {
-    display: none;
-  }
-  
-  span {
-    font-size: 1rem;
-    line-height: 1.2em;
   }
 }
