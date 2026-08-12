@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Duality</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">Duality</p>
+        <h1>Web app boilerplate</h1>
+        <p class="description">
+          A clean starting point for an interactive sound experience that will
+          support mouse, keyboard, and gamepad input.
+        </p>
+      </header>
+
+      <section class="panel" aria-labelledby="mode-title">
+        <div>
+          <h2 id="mode-title">Input mode</h2>
+          <p id="mode-description">Standard mode uses mouse and keyboard.</p>
+        </div>
+
+        <div class="actions">
+          <button type="button" data-mode="standard" class="is-active">
+            Standard mode
+          </button>
+          <button type="button" data-mode="gamepad">Gamepad mode</button>
+        </div>
+      </section>
+
+      <section class="panel status" aria-live="polite">
+        <h2>Status</h2>
+        <p id="status-text">Ready for input.</p>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
