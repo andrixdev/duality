@@ -43,7 +43,7 @@ canvas {
 }
 #controls {
   pointer-events: none;
-  --wid: 200px;
+  --wid: 400px;
   position: fixed;
   top: 0;
   left: 0;
@@ -60,21 +60,29 @@ canvas {
   flex-flow: row;
   
   .control-panel {
-    min-width: var(--wid);
-    transform: translateX(calc(-0 * var(--wid)));
-    transition: transform 500ms ease-out;
+    width: 50%;
     display: flex;
     flex-flow: column;
     justify-content: center;
+    transform-origin: center center;
+    transition: transform 220ms ease;
+    
+    &.active {
+      transform: scale(1.3);
+    }
+    
+    &:not(.active) .control p {
+      opacity: 0.5;
+    }
     
     .control {
-      
       
       p {
         line-height: .75em;
         margin: .5em 0;
         text-shadow: black 0 0 5px;
         font-size: 1.25rem;
+        transition: opacity 300ms;
         
         &.value {
           font-size: 1.75rem;

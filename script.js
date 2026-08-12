@@ -865,6 +865,7 @@ class UI {
     this.updatePanel(way)
   }
   initInteractions () {
+    document.querySelectorAll(".control-panel")[this.panelIndex].classList.add("active")
     // Mouse motion on grid
     let lastX, lastY
     can2.addEventListener("pointermove", ev => {
@@ -888,24 +889,26 @@ class UI {
       if (ev.code == "ArrowLeft") {
         ev.preventDefault()
         // Change panel index
-        this.panelIndex = (this.panelIndex + 2 * this.nb - 1) % this.nb
-        Array.from(document.querySelectorAll(".control")).forEach(node => {
-          let wid = window.getComputedStyle(node).getPropertyValue('--wid')
-          wid = wid.split("px")[0]
-          let newX = -this.panelIndex * wid
-          node.style.transform = "translateX(" + newX + "px)"
+        this.panelIndex = 0
+        document.querySelectorAll(".control-panel").forEach((panel, i) => {
+          if (i === this.panelIndex) {
+            panel.classList.add("active")
+          } else {
+            panel.classList.remove("active")
+          }
         })
       }
       // Right Arrow -> next panel
       else if (ev.code == "ArrowRight") {
         ev.preventDefault()
         // Change panel index
-        this.panelIndex = (this.panelIndex + 2 * this.nb + 1) % this.nb
-        Array.from(document.querySelectorAll(".control")).forEach(node => {
-          let wid = window.getComputedStyle(node).getPropertyValue('--wid')
-          wid = wid.split("px")[0]
-          let newX = -this.panelIndex * wid
-          node.style.transform = "translateX(" + newX + "px)"
+        this.panelIndex = 1
+        document.querySelectorAll(".control-panel").forEach((panel, i) => {
+          if (i === this.panelIndex) {
+            panel.classList.add("active")
+          } else {
+            panel.classList.remove("active")
+          }
         })
       }
       // Up arrow -> increase current active variable
@@ -914,6 +917,10 @@ class UI {
         ev.preventDefault()
         let way = ev.code == "ArrowUp" ? "up" : "down"
         this.adjustActivePanel(way)
+      }
+      else if (ev.code == "KeyB") {
+        let guide = document.getElementById('guide-overlay')
+        if (guide) guide.style.display = guide.style.display === 'none' ? 'flex' : 'none'
       }
     })
 
@@ -962,10 +969,10 @@ class UI {
       this.panel1value.innerHTML = params.particlesGradCoupling
     }
     else if (modeName == "slits") {
-      this.panel0name.innerHTML = "Energy injection<br/>(right side)"
-      this.panel1name.innerHTML = "Field diffusion"
-      this.panel0value.innerHTML = params.particlesEnergyInjection
-      this.panel1value.innerHTML = params.fieldDiffusion
+      this.panel0name.innerHTML = "Field diffusion"
+      this.panel1name.innerHTML = "Energy injection<br/>(right side)"
+      this.panel0value.innerHTML = params.fieldDiffusion
+      this.panel1value.innerHTML = params.particlesEnergyInjection
     }
   }
   updatePanel(way) {
@@ -979,8 +986,8 @@ class UI {
     let minValue = 0
     let maxValue = 1000
     
-    let isEnergyInjection = (modeName == "base" || modeName == "constellations" || modeName == "bouncing" || modeName == "slits") && pIndex == 0
-    let isDiffusion = (modeName == "base" || modeName == "slits") && pIndex == 1
+    let isEnergyInjection = ((modeName == "base" || modeName == "constellations" || modeName == "bouncing") && pIndex == 0) || (modeName == "slits" && pIndex == 1)
+    let isDiffusion = (modeName == "base" && pIndex == 1) || (modeName == "slits" && pIndex == 0)
     let isRainIntensity = modeName == "rain" && pIndex == 0
     let isRainQuantity = modeName == "rain" && pIndex == 1
     let isViscosity = modeName == "constellations" && pIndex == 1
@@ -1506,25 +1513,41 @@ class Gamepad {
     }
 
     if (leftBumper?.pressed) {
-      console.log("JS object: leftBumper (LB)")
-      // Action for left bumper
+      if (this.isNewButtonPress(gamepad.index, 4, true)) {
+        console.log("JS object: leftBumper (LB)")
+        cycleMode(-1)
+      }
+    } else {
+      this.isNewButtonPress(gamepad.index, 4, false)
     }
 
     // Index 6 and 7 are traditionally Left and Right analog triggers
-    if (leftTrigger?.value > 0.1) {
-      console.log(`Left trigger depressed to: ${leftTrigger?.value * 100}%`)
-      console.log("JS object: leftTrigger (LT)")
-      // Action for left trigger
+    if ((leftTrigger?.value ?? 0) > 0.1) {
+      if (this.isNewButtonPress(gamepad.index, 6, true)) {
+        console.log(`Left trigger depressed to: ${leftTrigger?.value * 100}%`)
+        console.log("JS object: leftTrigger (LT)")
+        cycleMode(-1)
+      }
+    } else {
+      this.isNewButtonPress(gamepad.index, 6, false)
     }
 
     if ((rightTrigger?.value ?? 0) > 0.1) {
-      console.log("JS object: rightTrigger (RT)")
-      // Action for right trigger
+      if (this.isNewButtonPress(gamepad.index, 7, true)) {
+        console.log("JS object: rightTrigger (RT)")
+        cycleMode(1)
+      }
+    } else {
+      this.isNewButtonPress(gamepad.index, 7, false)
     }
 
     if (rightBumper?.pressed) {
-      console.log("JS object: rightBumper (RB)")
-      // Action for right bumper
+      if (this.isNewButtonPress(gamepad.index, 5, true)) {
+        console.log("JS object: rightBumper (RB)")
+        cycleMode(1)
+      }
+    } else {
+      this.isNewButtonPress(gamepad.index, 5, false)
     }
 
     if (backButton?.pressed) {
@@ -1570,7 +1593,14 @@ class Gamepad {
     if (dpadLeft?.pressed) {
       console.log("JS object: dpadLeft")
       if (this.isNewButtonPress(gamepad.index, 14, true)) {
-        cycleMode(-1)
+        ui.panelIndex = 0
+        document.querySelectorAll(".control-panel").forEach((panel, i) => {
+          if (i === ui.panelIndex) {
+            panel.classList.add("active")
+          } else {
+            panel.classList.remove("active")
+          }
+        })
       }
       // Action for D-pad left
     } else {
@@ -1580,7 +1610,14 @@ class Gamepad {
     if (dpadRight?.pressed) {
       console.log("JS object: dpadRight")
       if (this.isNewButtonPress(gamepad.index, 15, true)) {
-        cycleMode(1)
+        ui.panelIndex = 1
+        document.querySelectorAll(".control-panel").forEach((panel, i) => {
+          if (i === ui.panelIndex) {
+            panel.classList.add("active")
+          } else {
+            panel.classList.remove("active")
+          }
+        })
       }
       // Action for D-pad right
     } else {

@@ -12,12 +12,23 @@
     .dot { fill: #cad1df; }
     
     .ctrl-body { fill: #16171d; stroke: #3e4453; stroke-width: 3; filter: url(#shadow); }
-    .ctrl-panel { fill: #16181d; }
+    .highlighted-ctrl-body {
+        fill: #7b8193;
+        stroke: rgb(219, 224, 238);
+        stroke-width: 3;
+        filter: url(#shadow);
+    }
+    .ctrl-panel { fill: #5f6a86; }
     .ctrl-detail { fill: #0b0c0f; stroke: #2d313b; stroke-width: 2; }
   </style>
   
   <!-- Controller Base (Expanded grips and central body/color zone) -->
   <g transform="translate(150, 140)">
+     <!-- Left Trigger / Bumper area suggestion -->
+     <path d="M 40 10 C 60 -30 110 -30 130 10 Z" class="highlighted-ctrl-body" fill="#1f2229"/>
+     <!-- Right Trigger / Bumper area suggestion -->
+     <path d="M 370 10 C 390 -30 440 -30 460 10 Z" class="highlighted-ctrl-body" fill="#1f2229"/>
+     
      <!-- Left Grip -->
      <rect x="0" y="0" width="150" height="320" rx="80" ry="80" class="ctrl-body"/>
      <!-- Right Grip -->
@@ -31,7 +42,7 @@
 
   <!-- Left Stick -->
   <circle cx="260" cy="220" r="40" class="ctrl-detail" />
-  <circle cx="260" cy="220" r="28" fill="#323744" />
+  <circle cx="260" cy="220" r="28" fill="#ac2f3c" class="highlighted-ctrl-body" />
 
   <!-- Right Stick -->
   <circle cx="480" cy="300" r="40" class="ctrl-detail" />
@@ -39,28 +50,41 @@
 
   <!-- D-Pad -->
   <g transform="translate(320, 300)">
-    <path d="M -12 -35 L 12 -35 L 12 -12 L 35 -12 L 35 12 L 12 12 L 12 35 L -12 35 L -12 12 L -35 12 L -35 -12 L -12 -12 Z" fill="#1f2229" stroke="#3e4453" stroke-width="2"/>
+    <path d="M -12 -35 L 12 -35 L 12 -12 L 35 -12 L 35 12 L 12 12 L 12 35 L -12 35 L -12 12 L -35 12 L -35 -12 L -12 -12 Z" fill="#1f2229" stroke="#3e4453" stroke-width="2" class="highlighted-ctrl-body" />
   </g>
 
   <!-- Action Buttons -->
   <g transform="translate(540, 220)">
+    <!-- Initial colors: stroke="#2ecc71", stroke="#e74c3c", stroke="#3498db", stroke="#f1c40f" -->
     <circle cx="0" cy="0" r="38" fill="#181a20" />
-    <circle cx="0" cy="24" r="10" fill="#111" stroke="#2ecc71" stroke-width="2"/>  <!-- A -->
+    <circle cx="0" cy="24" r="10" fill="#111" stroke="#30303c" stroke-width="2"/>  <!-- A -->
     <circle cx="24" cy="0" r="10" fill="#111" stroke="#e74c3c" stroke-width="2"/>  <!-- B -->
-    <circle cx="-24" cy="0" r="10" fill="#111" stroke="#3498db" stroke-width="2"/> <!-- X -->
-    <circle cx="0" cy="-24" r="10" fill="#111" stroke="#f1c40f" stroke-width="2"/> <!-- Y -->
+    <circle cx="-24" cy="0" r="10" fill="#111" stroke="#32303c" stroke-width="2"/> <!-- X -->
+    <circle cx="0" cy="-24" r="10" fill="#111" stroke="#30303c" stroke-width="2"/> <!-- Y -->
     
     <!-- Button Letters -->
-    <text x="0" y="28" font-size="11" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="bold">A</text>
+    <text x="0" y="28" font-size="11" fill="#30303c" font-family="sans-serif" text-anchor="middle" font-weight="bold">A</text>
     <text x="24" y="4" font-size="11" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="bold">B</text>
-    <text x="-24" y="4" font-size="11" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="bold">X</text>
-    <text x="0" y="-20" font-size="11" fill="#fff" font-family="sans-serif" text-anchor="middle" font-weight="bold">Y</text>
+    <text x="-24" y="4" font-size="11" fill="#30303c" font-family="sans-serif" text-anchor="middle" font-weight="bold">X</text>
+    <text x="0" y="-20" font-size="11" fill="#30303c" font-family="sans-serif" text-anchor="middle" font-weight="bold">Y</text>
   </g>
   
   <!-- View/Menu/Home -->
   <circle cx="400" cy="180" r="18" fill="#101115" stroke="#333" stroke-width="2"/>
   <rect x="345" y="220" width="18" height="18" rx="4" fill="#323744" />
   <rect x="435" y="220" width="18" height="18" rx="4" fill="#323744" />
+
+  <!-- Left Trigger line and text -->
+  <text x="320" y="40" class="callout" text-anchor="middle">LT</text>
+  <text x="320" y="70" class="subtext" text-anchor="middle">Previous Mode</text>
+  <polyline points="320,80 320,95 235,120" class="line" />
+  <circle cx="235" cy="120" r="4" class="dot" />
+
+  <!-- Right Trigger line and text -->
+  <text x="480" y="40" class="callout" text-anchor="middle">RT</text>
+  <text x="480" y="70" class="subtext" text-anchor="middle">Next Mode</text>
+  <polyline points="480,80 480,95 565,120" class="line" />
+  <circle cx="565" cy="120" r="4" class="dot" />
 
   <!-- Left stick line and text -->
   <text x="40" y="70" class="callout">Left Stick</text>
@@ -70,7 +94,7 @@
 
   <!-- D-Pad L/R line and text -->
   <text x="30" y="380" class="callout">Left / Right</text>
-  <text x="30" y="410" class="subtext">Cycle Modes</text>
+  <text x="30" y="410" class="subtext">Choose Parameter</text>
   <polyline points="170,375 200,375 286,300" class="line" />
   <circle cx="286" cy="300" r="4" class="dot" />
 
