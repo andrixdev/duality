@@ -27,5 +27,9 @@ window.addEventListener("keydown", (event) => {
 });
 
 window.addEventListener("pointerdown", (event) => {
+  if (event.target?.dataset?.mode) {
+    return;
+  }
+
   statusText.textContent = `Pointer input at ${Math.round(event.clientX)}, ${Math.round(event.clientY)}`;
 });
