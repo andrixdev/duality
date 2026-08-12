@@ -2,7 +2,7 @@ const modeDescription = document.querySelector("#mode-description");
 const statusText = document.querySelector("#status-text");
 const modeButtons = document.querySelectorAll("[data-mode]");
 
-const setMode = (mode) => {
+const setMode = (mode, { announce = true } = {}) => {
   const isGamepad = mode === "gamepad";
 
   modeButtons.forEach((button) => {
@@ -13,7 +13,9 @@ const setMode = (mode) => {
     ? "Gamepad mode is selected. Connect a controller to continue."
     : "Standard mode uses mouse and keyboard.";
 
-  statusText.textContent = `Switched to ${isGamepad ? "gamepad" : "standard"} mode.`;
+  if (announce) {
+    statusText.textContent = `Switched to ${isGamepad ? "gamepad" : "standard"} mode.`;
+  }
 };
 
 modeButtons.forEach((button) => {
@@ -39,3 +41,5 @@ window.addEventListener("pointerdown", (event) => {
 
   statusText.textContent = `Pointer input at ${Math.round(event.clientX)}, ${Math.round(event.clientY)}`;
 });
+
+setMode("standard", { announce: false });
