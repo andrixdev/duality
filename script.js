@@ -818,6 +818,7 @@ class UI {
     this.panel1name = this.panels[1].querySelector("p.name")
     this.panel1value = this.panels[1].querySelector("p.value")
     this.audioHasBooted = false
+    this.virtualPointer = { x: size / 2, y: size / 2 }
     this.gamepad = gamepad
     this.updatePanelsMode(baseParams.modeName)
     this.initInteractions()
@@ -828,17 +829,39 @@ class UI {
       this.audioHasBooted = true
     }
   }
+  injectAlongPath (fromX, fromY, toX, toY) {
+    const halts = 4
+    for (let h = 1; h <= halts; h++) {
+      let haltX = fromX + h / halts * (toX - fromX)
+      let haltY = fromY + h / halts * (toY - fromY)
+      iGrid.addValue(haltX, haltY, params.injectionAmplitude)
+    }
+  }
+  updateVirtualPointer (xAxis, yAxis, deadzone) {
+    const center = size / 2
+    const maxCoord = size - 1e-6
+    const amplitude = Math.sqrt(xAxis * xAxis + yAxis * yAxis)
+    const prevX = this.virtualPointer.x
+    const prevY = this.virtualPointer.y
+    const nextX = Math.min(maxCoord, Math.max(0, center + xAxis * center))
+    const nextY = Math.min(maxCoord, Math.max(0, center + yAxis * center))
+
+    this.virtualPointer.x = nextX
+    this.virtualPointer.y = nextY
+
+    if (amplitude <= deadzone) {
+      return
+    }
+
+    this.injectAlongPath(prevX, prevY, nextX, nextY)
+  }
   initInteractions () {
     // Mouse motion on grid
     let lastX, lastY
     can2.addEventListener("pointermove", ev => {
       let x = ev.offsetX, y = ev.offsetY
-      // Inject in n points between last position and new position
-      const halts = 4
-      for (let h = 1; h <= halts; h++) {
-        let haltX = lastX + h / halts * (x - lastX)
-        let haltY = lastY + h / halts * (y - lastY)
-        iGrid.addValue(haltX, haltY, params.injectionAmplitude)
+      if (lastX !== undefined && lastY !== undefined) {
+        this.injectAlongPath(lastX, lastY, x, y)
       }
       lastX = x
       lastY = y
@@ -887,6 +910,9 @@ class UI {
 
     this.gamepad.setInteractionHandler(() => {
       this.bootAudio()
+    })
+    this.gamepad.setLeftJoystickHandler((xAxis, yAxis, deadzone) => {
+      this.updateVirtualPointer(xAxis, yAxis, deadzone)
     })
     
     // Mode toggle
@@ -1305,14 +1331,23 @@ class Gamepad {
     this.activeGamepads = {}
     this.isLoopRunning = false
     this.onInteraction = null
+    this.onLeftJoystick = null
     this.initConnectionListeners()
   }
   setInteractionHandler(handler) {
     this.onInteraction = handler
   }
+  setLeftJoystickHandler(handler) {
+    this.onLeftJoystick = handler
+  }
   notifyInteraction() {
     if (this.onInteraction) {
       this.onInteraction()
+    }
+  }
+  notifyLeftJoystick(xAxis, yAxis, deadzone) {
+    if (this.onLeftJoystick) {
+      this.onLeftJoystick(xAxis, yAxis, deadzone)
     }
   }
   initConnectionListeners() {
@@ -1440,8 +1475,8 @@ class Gamepad {
     }
 
     // Index 6 and 7 are traditionally Left and Right analog triggers
-    if (leftTrigger.value > 0.1) {
-      console.log(`Left trigger depressed to: ${leftTrigger.value * 100}%`)
+    if (leftTrigger?.value > 0.1) {
+      console.log(`Left trigger depressed to: ${leftTrigger?.value * 100}%`)
       console.log("JS object: leftTrigger (LT)")
       // Action for left trigger
     }
@@ -1516,6 +1551,8 @@ class Gamepad {
     if (hasAxisInteraction) {
       this.notifyInteraction()
     }
+
+    this.notifyLeftJoystick(leftXAxis, leftYAxis, DEADZONE)
 
     if (Math.abs(leftXAxis) > DEADZONE) {
       console.log(`Left joystick tilted horizontally: ${leftXAxis}`)
