@@ -918,7 +918,7 @@ class UI {
     })
 
     this.gamepad.setInteractionHandler(() => {
-      this.bootAudio()
+      // Audio engine requires explicit user gesture across window, not joystick touches
     })
     this.gamepad.setLeftJoystickHandler((xAxis, yAxis, deadzone) => {
       this.updateVirtualPointer(xAxis, yAxis, deadzone)
@@ -1486,8 +1486,13 @@ class Gamepad {
     }
 
     if (buttonB?.pressed) {
-      console.log("JS object: buttonB (B / Circle)")
-      // Action for B / Circle
+      if (this.isNewButtonPress(gamepad.index, 1, true)) {
+        console.log("JS object: buttonB (B / Circle)")
+        let guide = document.getElementById('guide-overlay')
+        if (guide) guide.style.display = guide.style.display === 'none' ? 'flex' : 'none'
+      }
+    } else {
+      this.isNewButtonPress(gamepad.index, 1, false)
     }
 
     if (buttonX?.pressed) {

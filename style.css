@@ -83,3 +83,20 @@ canvas {
     }
   }
 }
+
+#guide-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.gamepad-guide {
+  width: min(800px, 90vw);
+  height: auto;
+}
+
