@@ -7,35 +7,32 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <main class="app">
-      <header class="hero">
-        <p class="eyebrow">Duality</p>
-        <h1>Web app boilerplate</h1>
-        <p class="description">
-          A clean starting point for an interactive sound experience that will
-          support mouse, keyboard, and gamepad input.
-        </p>
-      </header>
-
-      <section class="panel" aria-labelledby="mode-title">
-        <div>
-          <h2 id="mode-title">Input mode</h2>
-          <p id="mode-description">Standard mode uses mouse and keyboard.</p>
+    <section id="controls">
+      <div class="control-panel">
+        <div class="control">
+          <p class="name">-</p>
+          <p class="value">0</p>
         </div>
-
-        <div class="actions">
-          <button type="button" data-mode="standard" class="is-active">
-            Standard mode
-          </button>
-          <button type="button" data-mode="gamepad">Gamepad mode</button>
+      </div>
+      <div class="control-panel">
+        <div class="control">
+          <p class="name">-</p>
+          <p class="value">0</p>
         </div>
-      </section>
+      </div>
+    </section>
+    
+    <section id="ctrl-buttons">
+      <p><button id="start-sound">Start sound</button></p>
+      <p><button id="start-gamepad">Start gamepad controls</button></p>
+    </section>
 
-      <section class="panel status" aria-live="polite">
-        <h2>Status</h2>
-        <p id="status-text">Ready for input.</p>
-      </section>
-    </main>
+    <footer>
+      <p>Press Spacebar to toggle controls</p>
+      <p>Use arrows to change values</p>
+      <p>Use Q/W (or A/Z) to change mode</p>
+      <p><span>WARNING!<br/>Sound is played, check your volume.</span></p>
+    </footer>
 
     <script src="./script.js"></script>
   </body>

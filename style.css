@@ -1,111 +1,144 @@
-:root {
-  color-scheme: dark;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  background: #050816;
-  color: #f3f7ff;
+html {
+  background: #02040c;
+  background: hsl(200, 5%, 70%);
+  height: 100%;
+  overflow: hidden;
 }
-
-* {
-  box-sizing: border-box;
+/*
+.circle {
+  width: 5px;
+  height: 5px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  z-index: 10;
+  opacity: 0.4;
 }
-
+*/
 body {
-  margin: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle at top, rgba(91, 141, 239, 0.25), transparent 35%),
-    linear-gradient(180deg, #050816 0%, #090f24 100%);
+  height: 100%;
 }
-
-.app {
-  width: min(720px, calc(100% - 2rem));
-  display: grid;
-  gap: 1rem;
-  padding: 3rem 0;
+p, button {
+  font-family: "Quintessential", "Outfit", sans-serif;
+  color: white;
+  /*pointer-events: none;*/
 }
-
-.hero,
-.panel {
-  padding: 1.5rem;
-  border: 1px solid rgba(243, 247, 255, 0.12);
-  border-radius: 1rem;
-  background: rgba(11, 18, 40, 0.78);
-  backdrop-filter: blur(10px);
+canvas {
+  border-radius: 2px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  border-radius: 5px;
 }
-
-.eyebrow {
-  margin: 0 0 0.5rem;
-  color: #89a7ff;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.8rem;
+#can-1 {
+  background: black;
+  z-index: 1;
+  box-shadow: #0008 -6px 6px 5px 8px; 
 }
-
-h1,
-h2,
-p {
-  margin-top: 0;
+#can-2 {
+  z-index: 2;
 }
-
-h1 {
-  margin-bottom: 0.75rem;
-  font-size: clamp(2rem, 4vw, 3rem);
+#ctrl-buttons {
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  height: 200px;
+  z-index: 3;
+  
+  p {
+    text-align: center;
+    
+    button {
+      position: relative;
+      color: white;
+      border: none;
+      padding: 1em;
+      font-size: 1.125rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      background: #000D;
+      box-shadow: 0 0 7px #FFFA;
+      border-radius: 3px;
+      
+      &:hover {
+        text-shadow: 0 0 5px white;
+        box-shadow: 0 0 10px white;
+      }
+    }
+  }
 }
-
-.description,
-#mode-description,
-#status-text {
-  margin-bottom: 0;
-  color: #c9d4f2;
-}
-
-.panel {
+#controls {
+  pointer-events: none;
+  --wid: 200px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: var(--wid);
+  height: 120px;
+  z-index: 10;
+  color: white;
+  text-align: center;
+  overflow: hidden;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
+  flex-flow: row;
+  display: none;
+  
+  &.visible {
+    display: flex;
+  }
+  
+  .control-panel {
+    min-width: var(--wid);
+    transform: translateX(calc(-0 * var(--wid)));
+    transition: transform 500ms ease-out;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    
+    .control {
+      
+      
+      p {
+        line-height: .75em;
+        margin: .5em 0;
+        text-shadow: black 0 0 5px;
+        font-size: 1.25rem;
+        
+        &.value {
+          font-size: 1.75rem;
+        }
+      }
+    }
+  }
 }
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-button {
-  border: 0;
-  border-radius: 999px;
-  padding: 0.8rem 1.1rem;
-  background: #192444;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  transition: transform 160ms ease, background 160ms ease;
-}
-
-button:hover,
-button:focus-visible {
-  background: #24345f;
-  transform: translateY(-1px);
-  outline: none;
-}
-
-button.is-active {
-  background: linear-gradient(135deg, #6d8dff, #8a5cff);
-}
-
-.status {
-  display: block;
-}
-
-@media (max-width: 640px) {
-  .panel {
-    flex-direction: column;
-    align-items: stretch;
+footer {
+  pointer-events: none;
+  position: fixed;
+  bottom: 0;
+  opacity: 0.75;
+  font-size: .75em;
+  text-align: center;
+  font-style: italic;
+  width: 100%;
+  z-index: 5;
+  line-height: .5em;
+  
+  &.hidden {
+    display: none;
+  }
+  
+  span {
+    font-size: 1rem;
+    line-height: 1.2em;
   }
 }
