@@ -250,6 +250,7 @@ class Grid {
       grid[i] = initValue
     }
     this.grid = grid
+    this.scratchGrid = null // Second, same-size buffer used to ping-pong the grid's contents across physics steps (see getScratchGrid() / commitScratchGrid() below). Left unallocated until first needed.
   }
   getGridCXCY(x, y) {
     // Periodic check
@@ -308,6 +309,26 @@ class Grid {
     }
     let index = cy * dim + cx
     return this.grid[index]
+  }
+  getScratchGrid() {
+    // Lazily allocate the scratch buffer once (sized to match the live grid), then keep reusing
+    // the very same Float32Array forever after. Callers write a whole new generation of values
+    // into this buffer, then call commitScratchGrid() to make it the new live grid. Without this,
+    // code that computes "the next grid state" would otherwise allocate a brand new Float32Array
+    // every physics step (up to 8 times per rendered frame), which the garbage collector then has
+    // to clean up - a steady source of allocation churn that can cause visible frame stutter.
+    if (this.scratchGrid === null || this.scratchGrid.length !== this.grid.length) {
+      this.scratchGrid = new Float32Array(this.grid.length)
+    }
+    return this.scratchGrid
+  }
+  commitScratchGrid() {
+    // Swap the roles of the two buffers: the scratch buffer we just finished writing into becomes
+    // the new live grid, and the old live grid becomes next physics step's scratch buffer (its
+    // old contents will simply be overwritten cell-by-cell before anyone reads them again).
+    let previousGrid = this.grid
+    this.grid = this.scratchGrid
+    this.scratchGrid = previousGrid
   }
   getLocalLaplacian(cx, cy, mode) {
     let lap = 0
@@ -544,7 +565,9 @@ class System {
     */
   }
   updateVariationGrid() {
-    let newVgrid = new Float32Array(dim * dim)
+    // Write the next generation of values into the grid's persistent scratch buffer instead of
+    // allocating a brand new Float32Array here on every physics step (see Grid.getScratchGrid()).
+    let newVgrid = this.vGrid.getScratchGrid()
     
     // Numerical viscosity of variation grid
     let vVisc = params.numericalVariationViscosity
@@ -592,11 +615,14 @@ class System {
       }
     }
     
-    this.vGrid.grid = newVgrid
+    // Make the buffer we just filled the new live grid (and recycle the old one as scratch).
+    this.vGrid.commitScratchGrid()
     
   }
   updateIntensityGrid() {
-    let newIgrid = new Float32Array(dim * dim)
+    // Same reasoning as updateVariationGrid(): reuse the persistent scratch buffer rather than
+    // allocating a fresh Float32Array every physics step.
+    let newIgrid = this.iGrid.getScratchGrid()
     let dtt = physicsStepMs * dt
     audioMetrics.iGridMax = 0
     
@@ -631,7 +657,8 @@ class System {
       }
     }
     
-    this.iGrid.grid = newIgrid
+    // Make the buffer we just filled the new live grid (and recycle the old one as scratch).
+    this.iGrid.commitScratchGrid()
   }
   updateGridChunkForAudioWorklet(deltaTms) {
     // Push some new grid values to the worklet buffer
