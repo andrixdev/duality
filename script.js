@@ -144,6 +144,7 @@ let updateModeParams = () => {
     params.audioEnableBasicGrid = false//true
     params.audioEnableRawGrid = false
     params.audioEnableFft = true
+    
   }
 
   applyAutoPerformanceToParams()
@@ -392,58 +393,68 @@ class Grid {
         for (let cx = 0; cx < dim; cx++) {
           this.setCellValue(cx, cy, 1)
           this.setCellValue(cx, dim - cy, 1)
-          let a  = 0
         }
       }
       
     }
   }
   draw() {
-    this.grid.forEach((val, index) => {
-      ctx1.beginPath()
-      let h = 0, s = 75, l = 50, a = 0.5
-      
-      if (params.modeName == "base" || params.modeName == "bouncing") {
-        const minU = 0, maxU = 1
-        let v = 100 * Math.pow(remap(val, minU, maxU, 0, 1), .3)
-        let sensitivity = params.modeName == "base" ? 1 : 2
-        h = 250 + 2 * v * sensitivity
-        l = v * sensitivity
-      } else if (params.modeName == "rain") {
-        let v = remap(val, -1, 1, 0, 1)
-        h = 240 - 60 * v
-        l = 0 + 90 * Math.pow(remap(val, -.25, .25, 0, 1), 4)
-        a = 1
-      } else if (params.modeName == "constellations") {
-        s = 0
-        l = 0 + 40 * Math.pow(remap(val, -.5, .5, 0, 1), 2)
+    const ctx = ctx1
+    const grid = this.grid
+    const mode = params.modeName
+    const cs = cellSize
+
+    for (let y = 0; y < dim; y++) {
+      const yOffset = y * cs
+      for (let x = 0; x < dim; x++) {
+        const index = y * dim + x
+        const val = grid[index]
+        let h = 0, s = 75, l = 50, a = 0.5
+
+        if (mode == "base" || mode == "bouncing") {
+          const minU = 0, maxU = 1
+          const vv = Math.min(1, Math.max(0, (val - minU) / (maxU - minU)))
+          const v = 100 * Math.sqrt(Math.sqrt(vv))
+          const sensitivity = mode == "base" ? 1 : 2
+          h = 250 + 2 * v * sensitivity
+          l = v * sensitivity
+        } else if (mode == "rain") {
+          const v = Math.min(1, Math.max(0, (val + 1) / 2))
+          const v2 = Math.min(1, Math.max(0, (val + 0.25) / 0.5))
+          h = 240 - 60 * v
+          l = 90 * v2 * v2 * v2 * v2
+          a = 1
+        } else if (mode == "constellations") {
+          const vv = Math.min(1, Math.max(0, (val + 0.5) / 1))
+          s = 0
+          l = 40 * vv * vv
+        } else if (mode == "slits") {
+          const vv = Math.min(1, Math.max(0, (val + 1) / 2))
+          const v = vv * vv * vv * vv
+          h = 140 + 30 * v
+          l = 90 * v
+        }
+
+        ctx.fillStyle = "hsla(" + h + ", " + s + "%, " + l + "%, " + a + ")"
+        ctx.fillRect(x * cs, yOffset, cs, cs)
       }
-      else if (params.modeName == "slits") {
-        let v = Math.pow(remap(val, -1, 1, 0, 1), 4)
-        h = 140 + 30 * v
-        l = 0 + 90 * v
-      }
-      
-      ctx1.fillStyle = "hsla(" + h + ", " + s + "%, " + l + "%, " + a + ")"
-      let xy = this.getGridXY(index)
-      ctx1.rect(xy.x, xy.y, cellSize, cellSize)
-      ctx1.fill()
-      ctx1.closePath()
-    })
+    }
   }
-  gridDraw() {
-    this.grid.forEach((val, index) => {
-      ctx1.beginPath()
-      let h = 0
-      let s = 0
-      let l = 0
-      let a = val > 0 ? 1 : 0;
-      ctx1.fillStyle = "hsla(" + h + ", " + s + "%, " + l + "%, " + a + ")"
-      let xy = this.getGridXY(index)
-      ctx1.rect(xy.x, xy.y, cellSize, cellSize)
-      ctx1.fill()
-      ctx1.closePath()
-    })
+  wallDraw() {
+    const ctx = ctx1
+    const grid = this.grid
+    const cs = cellSize
+
+    for (let y = 0; y < dim; y++) {
+      const yOffset = y * cs
+        for (let x = 0; x < dim; x++) {
+        const val = grid[y * dim + x]
+        if (val == 1) {
+          ctx.fillStyle = "black"
+          ctx.fillRect(x * cs, yOffset, cs, cs)
+        }
+      }
+    }
   }
 }
 class System {
@@ -1836,7 +1847,7 @@ let update = () => {
   // Draw grid
   if (params.drawGrid) {
     iGrid.draw()
-    wGrid.gridDraw()
+    wGrid.wallDraw()
   }
   
   // Update audio
