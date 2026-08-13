@@ -226,6 +226,11 @@ const vonNeumannNeighborhood2hollow = [
   [-2, 0],
   [-1, -1]
 ]
+
+// Cache for Grid.getSumOfNorms(): for a given neighbor pattern (mode), the sum of squared neighbor-offset norms times cellSize^2 is a fixed constant - it does NOT depend on which cell (cx, cy) we're evaluating.
+let neighborSumOfNormsCache = {}
+let neighborSumOfNormsCacheCellSize = null
+
 let remap = (value, sourceMin, sourceMax, targetMin, targetMax) => {
     return Math.min(targetMax, Math.max(targetMin, targetMin + (targetMax - targetMin) * (value - sourceMin) / (sourceMax - sourceMin)))
 }
@@ -264,6 +269,28 @@ class Grid {
   getNeighborPattern(mode) {
     return (mode == "vn1" ? vonNeumannNeighborhood1 : (mode == "vn2h" ? vonNeumannNeighborhood2hollow : mooreNeighborhood1))
   }
+  getSumOfNorms(mode) {
+    // If cellSize changed since we last cached (e.g. the grid was resized via start()), the cached constants are stale, so throw away the whole cache and start fresh
+    if (neighborSumOfNormsCacheCellSize !== cellSize) {
+      neighborSumOfNormsCache = {}
+      neighborSumOfNormsCacheCellSize = cellSize
+    }
+
+    // Return the already-computed constant for this mode, if we have one cached
+    if (neighborSumOfNormsCache[mode] !== undefined) {
+      return neighborSumOfNormsCache[mode]
+    }
+
+    // First time we see this mode (or right after a cache reset): compute it once here, then remember it so no future call ever has to redo this work
+    let pattern = this.getNeighborPattern(mode)
+    let sumOfNorms = 0
+    pattern.forEach(p => {
+      sumOfNorms += (Math.pow(p[0], 2) + Math.pow(p[1], 2)) * Math.pow(cellSize, 2)
+    })
+
+    neighborSumOfNormsCache[mode] = sumOfNorms
+    return sumOfNorms
+  }
   getNeighborsIndexes(cx, cy, mode) {
     let indexes = []
     let pattern = this.getNeighborPattern(mode)
@@ -284,7 +311,9 @@ class Grid {
   }
   getLocalLaplacian(cx, cy, mode) {
     let lap = 0
-    let sumOfNorms = 0
+
+    // sumOfNorms is a fixed constant for this mode (independent of cx, cy)
+    let sumOfNorms = this.getSumOfNorms(mode)
     
     let intensity = this.getValue(cx, cy)
     let pattern = this.getNeighborPattern(mode)
@@ -295,9 +324,6 @@ class Grid {
       // Get laplacian intensity & add to lap value
       let neighIntensity = this.grid[neighIndex] - intensity
       lap += neighIntensity
-      
-      // Increment sum of squared norms of cell-neighbor distance
-      sumOfNorms += (Math.pow(p[0], 2) + Math.pow(p[1], 2)) * Math.pow(cellSize, 2)
     })
     
     // Divide by sum of squared norms of cell distance
@@ -471,7 +497,9 @@ class System {
   }
   getIntensityLaplacianWithWalls(cx, cy, mode) {
     let lap = 0
-    let sumOfNorms = 0
+
+    // This is the hottest function in the whole simulation: it runs once per cell, once per grid update, on every fixed physics step (up to 8 steps per rendered frame). sumOfNorms never depends on (cx, cy) so we get it from cache instead of recomputing it every time
+    let sumOfNorms = this.iGrid.getSumOfNorms(mode)
     
     let intensity = this.iGrid.getValue(cx, cy)
     let wallValue = this.wGrid.getValue(cx, cy)
@@ -486,9 +514,6 @@ class System {
       let wallImpact = 1 - 1/2 * (neighWallValue + wallValue)
       let neighIntensity = wallImpact * (this.iGrid.grid[neighIndex] - intensity)
       lap += neighIntensity
-      
-      // Increment sum of squared norms of cell-neighbor distance
-      sumOfNorms += (Math.pow(p[0], 2) + Math.pow(p[1], 2)) * Math.pow(cellSize, 2)
     })
     
     // Divide by sum of squared norms of cell distance
