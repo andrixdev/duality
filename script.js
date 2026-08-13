@@ -160,7 +160,11 @@ setup()
 // Simulation globals
 let dt = 0.1
 let step = 0
-let deltaTms = 20 // updated deltaT for physics
+let deltaTms = 20 // last measured real frame time (ms) - drives audio pacing & UI readout
+const physicsStepMs = 12 // fixed physics timestep (ms), kept below the scheme's stability threshold on any device
+const maxPhysicsStepsPerFrame = 8 // safety cap so a slow device catches up gradually instead of spiraling
+let physicsAccumulatorMs = 0
+let lastFrameTime = null
 const dim = params.gridDimension
 let cellSize = size / dim
 let audioMetrics = {
@@ -504,7 +508,7 @@ class System {
         
         // Final new value of variation
         let newValue = 0
-        let dtt = deltaTms * dt
+        let dtt = physicsStepMs * dt
         
         // First order
         newValue += (1 - vVisc) * (1 - dtt / tau) * variation
@@ -529,7 +533,7 @@ class System {
   }
   updateIntensityGrid() {
     let newIgrid = new Float32Array(dim * dim)
-    let dtt = deltaTms * dt
+    let dtt = physicsStepMs * dt
     audioMetrics.iGridMax = 0
     
     for (let cy = 0; cy < dim; cy++) {
@@ -666,7 +670,7 @@ class Particle {
     this.absorb(5, "vn1")
     */
     // Time resacling
-    let dtt = dt * deltaTms
+    let dtt = dt * physicsStepMs
     
     // 0 - Useful values
     let cxcy = this.iGrid.getGridCXCY(this.x, this.y)
@@ -1718,21 +1722,17 @@ let start = () => {
   initGrids()
   initSystem(iGrid, vGrid, wGrid)
   initParticles(iGrid, vGrid, wGrid)
+  physicsAccumulatorMs = 0 // discard any pending catch-up steps computed under the previous mode's params
 }
 start()
 
-// Main loop
-let update = () => {
-  // Capture deltaTms (1/2)
-  let now1 = performance.now()
-  ctx2.clearRect(0, 0, size, size)
-  
+// One fixed-size physics tick, always using PHYSICS_STEP_MS regardless of render frame rate
+let stepPhysics = () => {
   // Update particles (and audio metrics)
   audioMetrics.particlesTotalSpeed = 0
   particles.forEach(p => {
     p.interact()
     audioMetrics.particlesTotalSpeed += p.speed
-    if (params.drawParticles) p.draw()
   })
   
   // Update system grids
@@ -1746,6 +1746,33 @@ let update = () => {
     let randY = Math.random() * size
     iGrid.setValue(randX, randY, params.injectionAmplitude / 10)
   }
+  
+  // Increment main step counter
+  step++
+}
+
+// Main loop
+let update = () => {
+  // Measure real elapsed time since last rendered frame (drives audio pacing & UI readout)
+  let frameStart = performance.now()
+  if (lastFrameTime === null) lastFrameTime = frameStart
+  deltaTms = Math.min(frameStart - lastFrameTime, 250) // clamp huge stalls (tab switch, breakpoint, etc.)
+  lastFrameTime = frameStart
+  
+  // Advance physics in fixed steps, decoupled from render rate, so dtt stays within a stable range on any device
+  physicsAccumulatorMs += deltaTms
+  let stepsRun = 0
+  while (physicsAccumulatorMs >= physicsStepMs && stepsRun < maxPhysicsStepsPerFrame) {
+    stepPhysics()
+    physicsAccumulatorMs -= physicsStepMs
+    stepsRun++
+  }
+  if (stepsRun == maxPhysicsStepsPerFrame) physicsAccumulatorMs = 0 // device can't keep up; drop the backlog instead of spiraling
+  
+  ctx2.clearRect(0, 0, size, size)
+  
+  // Draw particles (once per rendered frame, using the latest physics state)
+  if (params.drawParticles) particles.forEach(p => p.draw())
   
   // Draw grid
   if (params.drawGrid) {
@@ -1765,12 +1792,6 @@ let update = () => {
     }
   }
   
-  // Increment main step counter
-  step++
-  
-  // Capture deltaTms (2/2)
-  let now2 = performance.now()
-  deltaTms = now2 - now1
   ui.updateDeltaTms()
 }
 
