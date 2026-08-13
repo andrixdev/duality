@@ -51,7 +51,7 @@ canvas {
   bottom: 0;
   margin: auto;
   width: var(--wid);
-  height: 120px;
+  height: 150px;
   z-index: 10;
   color: white;
   text-align: center;
@@ -78,14 +78,14 @@ canvas {
     .control {
       
       p {
-        line-height: .75em;
-        margin: .5em 0;
+        margin: .5em 0 -.75em;
         text-shadow: black 0 0 5px;
         font-size: 1.25rem;
         transition: opacity 300ms;
         
         &.value {
           font-size: 1.75rem;
+
         }
       }
     }

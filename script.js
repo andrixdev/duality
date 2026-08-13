@@ -724,9 +724,6 @@ class Particle {
       let threshold = alpha * (-Math.log(ran)) + (1 - alpha) * 1
       this.uThreshold = threshold
     }
-   
-    // Apply motion
-    this.moveBy(dx * dtt, dy * dtt)
   }
   inject(u, mode) {
     // Give to grid
