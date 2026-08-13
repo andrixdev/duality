@@ -63,7 +63,7 @@ let autoPerformance = {
   profileName: "native"
 }
 let pickAutoPerformanceProfile = (avgDeltaMs) => {
-  if (avgDeltaMs >= 190) return { name: "ultra-ultra-light", gridScale: 0.16, populationScale: 0.08 }
+  if (avgDeltaMs >= 190) return { name: "ultra-ultra-light", gridScale: 0.1, populationScale: 0.1 }
   if (avgDeltaMs >= 90) return { name: "ultra-light", gridScale: 0.45, populationScale: 0.25 }
   if (avgDeltaMs >= 55) return { name: "light", gridScale: 0.6, populationScale: 0.4 }
   if (avgDeltaMs >= 35) return { name: "balanced", gridScale: 0.75, populationScale: 0.6 }
@@ -71,10 +71,10 @@ let pickAutoPerformanceProfile = (avgDeltaMs) => {
 }
 let applyAutoPerformanceToParams = () => {
   let scaledDim = Math.round(baseParams.gridDimension * autoPerformance.gridScale)
-  params.gridDimension = Math.max(24, scaledDim)
+  params.gridDimension = Math.max(7, scaledDim) // Minimal grid size (7x7)
 
   let scaledPopulation = Math.round(params.population * autoPerformance.populationScale)
-  params.population = Math.max(6, scaledPopulation)
+  params.population = Math.max(6, scaledPopulation) // Minimal particle population
 }
 let updateModeParams = () => {
   params = structuredClone(baseParams)
