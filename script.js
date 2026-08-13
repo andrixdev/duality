@@ -50,6 +50,31 @@ const baseParams = {
   modeName: "base"
 }
 let params = structuredClone(baseParams)
+let autoPerformance = {
+  isEnabled: true,
+  hasLockedProfile: false,
+  warmupFrames: 10,
+  sampleFrames: 45,
+  frameCount: 0,
+  sampledCount: 0,
+  sampledDeltaSumMs: 0,
+  gridScale: 1,
+  populationScale: 1,
+  profileName: "native"
+}
+let pickAutoPerformanceProfile = (avgDeltaMs) => {
+  if (avgDeltaMs >= 90) return { name: "ultra-light", gridScale: 0.45, populationScale: 0.25 }
+  if (avgDeltaMs >= 55) return { name: "light", gridScale: 0.6, populationScale: 0.4 }
+  if (avgDeltaMs >= 35) return { name: "balanced", gridScale: 0.75, populationScale: 0.6 }
+  return { name: "native", gridScale: 1, populationScale: 1 }
+}
+let applyAutoPerformanceToParams = () => {
+  let scaledDim = Math.round(baseParams.gridDimension * autoPerformance.gridScale)
+  params.gridDimension = Math.max(24, scaledDim)
+
+  let scaledPopulation = Math.round(params.population * autoPerformance.populationScale)
+  params.population = Math.max(4, scaledPopulation)
+}
 let updateModeParams = () => {
   params = structuredClone(baseParams)
   if (mode == 5) {
@@ -119,6 +144,8 @@ let updateModeParams = () => {
     params.audioEnableRawGrid = false
     params.audioEnableFft = true
   }
+
+  applyAutoPerformanceToParams()
 }
  
 // Setup
@@ -165,7 +192,7 @@ const physicsStepMs = 12 // fixed physics timestep (ms), kept below the scheme's
 const maxPhysicsStepsPerFrame = 8 // safety cap so a slow device catches up gradually instead of spiraling
 let physicsAccumulatorMs = 0
 let lastFrameTime = null
-const dim = params.gridDimension
+let dim = params.gridDimension
 let cellSize = size / dim
 let audioMetrics = {
   iGridMax: 100,
@@ -1718,6 +1745,8 @@ let initParticles = (iGrid, vGrid, wGrid) => {
 // Start
 let start = () => {
   updateModeParams()
+  dim = params.gridDimension
+  cellSize = size / dim
   ui.updatePanelsMode(params.modeName)
   initGrids()
   initSystem(iGrid, vGrid, wGrid)
@@ -1751,6 +1780,33 @@ let stepPhysics = () => {
   step++
 }
 
+let runStartupAutoPerformanceTuning = (frameStart) => {
+  // Tune workload once at startup from measured frame time, then restart once with the selected profile.
+  if (!autoPerformance.isEnabled || autoPerformance.hasLockedProfile) return false
+
+  autoPerformance.frameCount++
+  if (autoPerformance.frameCount > autoPerformance.warmupFrames) {
+    autoPerformance.sampledCount++
+    autoPerformance.sampledDeltaSumMs += deltaTms
+  }
+  if (autoPerformance.sampledCount >= autoPerformance.sampleFrames) {
+    let avgDeltaMs = autoPerformance.sampledDeltaSumMs / autoPerformance.sampledCount
+    let selectedProfile = pickAutoPerformanceProfile(avgDeltaMs)
+    autoPerformance.gridScale = selectedProfile.gridScale
+    autoPerformance.populationScale = selectedProfile.populationScale
+    autoPerformance.profileName = selectedProfile.name
+    autoPerformance.hasLockedProfile = true
+    if (autoPerformance.gridScale < 1 || autoPerformance.populationScale < 1) {
+      console.log(`Auto-performance profile: ${autoPerformance.profileName} (${Math.round(avgDeltaMs)}ms avg frame)`)
+      start()
+      lastFrameTime = frameStart
+      return true
+    }
+  }
+
+  return false
+}
+
 // Main loop
 let update = () => {
   // Measure real elapsed time since last rendered frame (drives audio pacing & UI readout)
@@ -1758,6 +1814,8 @@ let update = () => {
   if (lastFrameTime === null) lastFrameTime = frameStart
   deltaTms = Math.min(frameStart - lastFrameTime, 250) // clamp huge stalls (tab switch, breakpoint, etc.)
   lastFrameTime = frameStart
+
+  if (runStartupAutoPerformanceTuning(frameStart)) return
   
   // Advance physics in fixed steps, decoupled from render rate, so dtt stays within a stable range on any device
   physicsAccumulatorMs += deltaTms
