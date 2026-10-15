@@ -208,15 +208,6 @@ let setup = () => {
     hei = window.innerHeight
   }
 
-  // Resulting number of cells on each dimension
-  if (wid > hei) {
-    dimX = baseParams.gridDimension
-    dimY = Math.floor(dimX * (hei / wid))
-  } else {
-    dimY = baseParams.gridDimension
-    dimX = Math.floor(dimY * (wid / hei))
-  }
-  
   can1.width = wid * dpr
   can1.height = hei * dpr
   ctx1.scale(dpr, dpr)
@@ -307,12 +298,24 @@ const pixelFontLower = {
   z: [...pixelFontPad, "11111", "00010", "00100", "01000", "11111"]
 }
 let lastFrameTime = null
-let cellSize = Math.max(wid, hei) / Math.max(dimX, dimY)
-// Simulation domain is exactly dimX x dimY square cells; it is stretched on screen only (canvas transform) so it fills the whole canvas
-const simW = dimX * cellSize
-const simH = dimY * cellSize
-ctx1.setTransform(wid / simW, 0, 0, hei / simH, 0, 0)
-ctx2.setTransform(wid / simW, 0, 0, hei / simH, 0, 0)
+let cellSize, simW, simH
+// (Re)computes grid cell counts and the stretch transform from params.gridDimension (which auto-performance may degrade)
+let initGridGeometry = () => {
+  if (wid > hei) {
+    dimX = params.gridDimension
+    dimY = Math.max(1, Math.floor(dimX * (hei / wid)))
+  } else {
+    dimY = params.gridDimension
+    dimX = Math.max(1, Math.floor(dimY * (wid / hei)))
+  }
+  cellSize = Math.max(wid, hei) / Math.max(dimX, dimY)
+  // Simulation domain is exactly dimX x dimY square cells; it is stretched on screen only (canvas transform) so it fills the whole canvas
+  simW = dimX * cellSize
+  simH = dimY * cellSize
+  ctx1.setTransform(wid / simW, 0, 0, hei / simH, 0, 0)
+  ctx2.setTransform(wid / simW, 0, 0, hei / simH, 0, 0)
+}
+initGridGeometry()
 let audioMetrics = {
   iGridMax: 100,
   particlesTotalSpeed: 0
@@ -1057,6 +1060,7 @@ class UI {
     this.initInteractions()
   }
   bootAudio () {
+    if (isHalted) return
     if (!this.audioHasBooted) {
       audio = new Explaudio()
       this.audioHasBooted = true
@@ -1161,7 +1165,7 @@ class UI {
       }
       else if (ev.code == "KeyB") {
         let guide = document.getElementById('guide-overlay')
-        if (guide) guide.style.display = guide.style.display === 'none' ? 'flex' : 'none'
+        if (guide && !isHalted) guide.style.display = guide.style.display === 'none' ? 'flex' : 'none'
       }
     })
 
@@ -1766,7 +1770,7 @@ class Gamepad {
       if (this.isNewButtonPress(gamepad.index, 1, true)) {
         console.log("JS object: buttonB (B / Circle)")
         let guide = document.getElementById('guide-overlay')
-        if (guide) guide.style.display = guide.style.display === 'none' ? 'flex' : 'none'
+        if (guide && !isHalted) guide.style.display = guide.style.display === 'none' ? 'flex' : 'none'
       }
     } else {
       this.isNewButtonPress(gamepad.index, 1, false)
@@ -1981,6 +1985,7 @@ let initParticles = (iGrid, vGrid, wGrid) => {
 // Start
 let start = () => {
   updateModeParams()
+  initGridGeometry()
   ui.updatePanelsMode(params.modeName, params.fullModeName)
   initGrids()
   initSystem(iGrid, vGrid, wGrid)
@@ -2038,6 +2043,21 @@ let stepPhysics = () => {
   step++
 }
 
+const minViableGridDimension = 25
+let isHalted = false
+let haltForInsufficientPerformance = () => {
+  isHalted = true
+  console.warn("Auto-performance: grid too small for this machine, stopping.")
+  let guide = document.getElementById("guide-overlay")
+  if (guide) guide.style.display = "none"
+  if (audio && audio.audioCtx) audio.audioCtx.close().catch(() => {})
+  audio = null
+  let popup = document.createElement("div")
+  popup.textContent = "Sorry, the computing capabilities of this machine are insufficient to run this simulation smoothly. The simulation has been stopped."
+  popup.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);box-sizing:border-box;width:min(90vw,480px);padding:clamp(14px,4vw,24px) clamp(16px,5vw,32px);background:rgba(20,20,20,0.92);color:#eee;border-radius:6px;font-family:'Quintessential','Outfit',sans-serif;font-size:clamp(14px,4vw,18px);line-height:1.6;text-align:center;z-index:1000;box-shadow:0 4px 24px rgba(0,0,0,0.5)"
+  document.body.appendChild(popup)
+}
+
 let runStartupAutoPerformanceTuning = (frameStart) => {
   // Tune workload once at startup from measured frame time, then restart once with the selected profile.
   if (!autoPerformance.isEnabled || autoPerformance.hasLockedProfile) return false
@@ -2054,6 +2074,12 @@ let runStartupAutoPerformanceTuning = (frameStart) => {
     autoPerformance.populationScale = selectedProfile.populationScale
     autoPerformance.profileName = selectedProfile.name
     autoPerformance.hasLockedProfile = true
+    let scaledDim = Math.max(7, Math.round(baseParams.gridDimension * autoPerformance.gridScale))
+    let finalMinDim = Math.floor(scaledDim * Math.min(wid, hei) / Math.max(wid, hei))
+    if (finalMinDim < minViableGridDimension) {
+      haltForInsufficientPerformance()
+      return true
+    }
     if (autoPerformance.gridScale < 1 || autoPerformance.populationScale < 1) {
       console.log(`Auto-performance profile: ${autoPerformance.profileName} (${Math.round(avgDeltaMs)}ms avg frame)`)
       start()
@@ -2113,6 +2139,7 @@ let update = () => {
 
 // Boot
 let frame = () => {
+  if (isHalted) return
   update()
   window.requestAnimationFrame(frame)
 }
