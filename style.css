@@ -148,7 +148,6 @@ canvas {
 .delta-tms .label {
   opacity: 0.75;
   font-size: 0.8rem;
-  text-transform: lowercase;
 }
 
 .delta-tms .value {
