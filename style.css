@@ -103,7 +103,7 @@ canvas {
   left: 50%;
   bottom: 84px;
   transform: translateX(-50%);
-  z-index: 30;
+  z-index: 10;
   text-align: center;
   pointer-events: none;
 
@@ -131,7 +131,7 @@ canvas {
   left: 50%;
   bottom: 18px;
   transform: translateX(-50%);
-  z-index: 30;
+  z-index: 10;
   display: inline-flex;
   align-items: baseline;
   gap: 0.5rem;
