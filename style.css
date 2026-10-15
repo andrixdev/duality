@@ -72,8 +72,8 @@ canvas {
     .control {
       
       p {
-        line-height: .75em;
-        margin: .5em 0;
+        line-height: 1.5em;
+        margin: 0;
         text-shadow: black 0 0 5px;
         font-size: 1.25rem;
         transition: opacity 300ms;
@@ -96,6 +96,24 @@ canvas {
   align-items: center;
   flex-direction: row;
   pointer-events: none;
+}
+
+.mode-name {
+  position: fixed;
+  left: 50%;
+  bottom: 84px;
+  transform: translateX(-50%);
+  z-index: 30;
+  text-align: center;
+  pointer-events: none;
+
+  .value {
+    margin: 0;
+    font-family: "Tangerine", "Quintessential", "Outfit", sans-serif;
+    font-size: 3.5rem;
+    line-height: 1;
+    text-shadow: black 0 0 5px;
+  }
 }
 
 .gamepad-guide + .gamepad-guide {

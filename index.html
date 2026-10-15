@@ -6,7 +6,7 @@
     <title>Duality</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Quintessential&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Quintessential&family=Tangerine:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
@@ -25,13 +25,17 @@
       </div>
     </section>
 
+    <div id="mode-name" class="mode-name" aria-live="polite">
+      <p class="value">base</p>
+    </div>
+
     <div id="delta-tms" class="delta-tms" aria-live="polite">
       <span class="label">deltaTms</span>
       <span class="value">0.0 ms</span>
     </div>
 
     <!-- Gamepad Instruction Still Image -->
-    <div id="guide-overlay">
+    <div id="guide-overlay" style="display: none;">
       <img src="./gamepad_guide.svg" class="gamepad-guide" alt="Gamepad controls guide" />
       <img src="./keyboard_guide.svg" class="gamepad-guide" alt="Keyboard controls guide" />
     </div>

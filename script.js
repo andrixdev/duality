@@ -48,7 +48,8 @@ const baseParams = {
   audioEnableBasicGrid: false,
   audioEnableRawGrid: false,
   audioEnableFft: false,
-  modeName: "base"
+  modeName: "base",
+  fullModeName: "The Playground"
 }
 let params = structuredClone(baseParams)
 let autoPerformance = {
@@ -82,6 +83,7 @@ let updateModeParams = () => {
   if (mode == 5) {
     // Slits
     params.modeName = "slits"
+    params.fullModeName = "The Interferences"
     params.wallCage = true
     params.wallType = 3
     params.population = 20
@@ -98,6 +100,7 @@ let updateModeParams = () => {
   if (mode == 4) {
     // Bouncing
     params.modeName = "bouncing"
+    params.fullModeName = "The Bouncing Droplets"
     params.population = 6
     params.particlesPosDiffusion = 0
     params.particlesRotDiffusion = 0
@@ -114,6 +117,7 @@ let updateModeParams = () => {
   if (mode == 3) {
     // Constellations
     params.modeName = "constellations"
+    params.fullModeName = "The Constellations"
     params.population = 3000
     params.drawParticlesPartners = true
     params.viscosity1 = 10
@@ -128,6 +132,7 @@ let updateModeParams = () => {
   if (mode == 2) {
     // Rain
     params.modeName = "rain"
+    params.fullModeName = "The Tempest"
     params.raindropsPerStep = 1
     
     // Audio
@@ -139,6 +144,7 @@ let updateModeParams = () => {
   if (mode == 1) {
     // Base
     params.modeName = "base"
+    params.fullModeName = "The Playground"
     
     // Audio
     params.audioEnableParticles = false//true
@@ -944,12 +950,13 @@ class UI {
     this.panel0value = this.panels[0].querySelector("p.value")
     this.panel1name = this.panels[1].querySelector("p.name")
     this.panel1value = this.panels[1].querySelector("p.value")
+    this.modeNameValue = document.querySelector("#mode-name .value")
     this.deltaTmsReadout = document.getElementById("delta-tms")
     this.deltaTmsValue = this.deltaTmsReadout ? this.deltaTmsReadout.querySelector(".value") : null
     this.audioHasBooted = false
     this.virtualPointer = { x: simW / 2, y: simH / 2 }
     this.gamepad = gamepad
-    this.updatePanelsMode(baseParams.modeName)
+    this.updatePanelsMode(baseParams.modeName, baseParams.fullModeName)
     this.updateDeltaTms()
     this.initInteractions()
   }
@@ -1073,7 +1080,8 @@ class UI {
     if (!this.deltaTmsValue) return
     this.deltaTmsValue.textContent = `${deltaTms.toFixed(1)} ms`
   }
-  updatePanelsMode(modeName) {
+  updatePanelsMode(modeName, fullModeName) {
+    if (this.modeNameValue) this.modeNameValue.textContent = fullModeName
     if (modeName == "base") {
       this.panel0name.innerHTML = "Energy injection"
       this.panel1name.innerHTML = "Field diffusion"
@@ -1840,7 +1848,7 @@ let initParticles = (iGrid, vGrid, wGrid) => {
 // Start
 let start = () => {
   updateModeParams()
-  ui.updatePanelsMode(params.modeName)
+  ui.updatePanelsMode(params.modeName, params.fullModeName)
   initGrids()
   initSystem(iGrid, vGrid, wGrid)
   initParticles(iGrid, vGrid, wGrid)
