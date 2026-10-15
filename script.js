@@ -14,7 +14,8 @@ let cycleMode = (step) => {
 
 // Common base for exposed parameters
 const baseParams = {
-  gridDimension: 80, // dim - Ready for some CPU sweat?
+  gridDimension: 150, // dim - Ready for some CPU sweat?
+  responsive: true,
   population: 2000, // pop - Particles population
   fieldDiffusion: 30, // Dp - Amplitude of diffusion
   fieldDiffusionTau: 100, // τp - Typical time of diffusion
@@ -155,7 +156,8 @@ let can1
 let can2
 let ctx1
 let ctx2
-let size
+let wid, hei
+let dimX, dimY
 let setup = () => {
   let body = document.getElementsByTagName("body")[0]
   can1 = document.createElement("canvas")
@@ -165,21 +167,40 @@ let setup = () => {
   can2.id = "can-2"
   ctx1 = can1.getContext("2d")
   ctx2 = can2.getContext("2d")
-  size = Math.max(300, Math.min(0.85 * window.innerWidth, 0.85 * window.innerHeight))
-  can1.width = size * dpr
-  can1.height = size * dpr
+
+  // Square or responsive rectangular frame
+  if (!params.responsive) {
+    size = Math.max(300, Math.min(0.85 * window.innerWidth, 0.85 * window.innerHeight))
+    wid = size
+    hei = size
+  } else {
+    wid = window.innerWidth
+    hei = window.innerHeight
+  }
+
+  // Resulting number of cells on each dimension
+  if (wid > hei) {
+    dimX = baseParams.gridDimension
+    dimY = Math.floor(dimX * (hei / wid))
+  } else {
+    dimY = baseParams.gridDimension
+    dimX = Math.floor(dimY * (wid / hei))
+  }
+  
+  can1.width = wid * dpr
+  can1.height = hei * dpr
   ctx1.scale(dpr, dpr)
-  can1.style.width = size + "px"
-  can1.style.height = size + "px"
-  can1.width = size
-  can1.height = size
-  can2.width = size * dpr
-  can2.height = size * dpr
+  can1.style.width = wid + "px"
+  can1.style.height = hei + "px"
+  can1.width = wid
+  can1.height = hei
+  can2.width = wid * dpr
+  can2.height = hei * dpr
   ctx2.scale(dpr, dpr)
-  can2.style.width = size + "px"
-  can2.style.height = size + "px"
-  can2.width = size
-  can2.height = size
+  can2.style.width = wid + "px"
+  can2.style.height = hei + "px"
+  can2.width = wid
+  can2.height = hei
 
   body.appendChild(can1)
   body.appendChild(can2)
@@ -194,8 +215,12 @@ const physicsStepMs = 12 // fixed physics timestep (ms), kept below the scheme's
 const maxPhysicsStepsPerFrame = 8 // safety cap so a slow device catches up gradually instead of spiraling
 let physicsAccumulatorMs = 0
 let lastFrameTime = null
-let dim = params.gridDimension
-let cellSize = size / dim
+let cellSize = Math.max(wid, hei) / Math.max(dimX, dimY)
+// Simulation domain is exactly dimX x dimY square cells; it is stretched on screen only (canvas transform) so it fills the whole canvas
+const simW = dimX * cellSize
+const simH = dimY * cellSize
+ctx1.setTransform(wid / simW, 0, 0, hei / simH, 0, 0)
+ctx2.setTransform(wid / simW, 0, 0, hei / simH, 0, 0)
 let audioMetrics = {
   iGridMax: 100,
   particlesTotalSpeed: 0
@@ -245,8 +270,8 @@ let getNormalRandoms = () => {
 
 class Grid {
   constructor(initValue) {
-    let grid = new Float32Array(dim * dim)
-    for (let i = 0; i < dim * dim; i++) {
+    let grid = new Float32Array(dimX * dimY)
+    for (let i = 0; i < dimX * dimY; i++) {
       grid[i] = initValue
     }
     this.grid = grid
@@ -254,17 +279,20 @@ class Grid {
   }
   getGridCXCY(x, y) {
     // Periodic check
-    x = (x + 2 * size) % size
-    y = (y + 2 * size) % size
+    x = (x + 2 * simW) % simW
+    y = (y + 2 * simH) % simH
     
-    return { cx: Math.floor(x / cellSize), cy: Math.floor(y / cellSize) }
+    // Clamp against floating point edge cases
+    return { cx: Math.min(dimX - 1, Math.floor(x / cellSize)), cy: Math.min(dimY - 1, Math.floor(y / cellSize)) }
   }
   getGridIndex(x, y) {
-    return Math.floor(y / cellSize) * dim + Math.floor(x / cellSize)
+    let cx = Math.min(dimX - 1, Math.floor(x / cellSize))
+    let cy = Math.min(dimY - 1, Math.floor(y / cellSize))
+    return cy * dimX + cx
   }
   getGridXY(index) {
-    let x = cellSize * (index % dim)
-    let y = cellSize * (Math.floor(index / dim))
+    let x = cellSize * (index % dimX)
+    let y = cellSize * (Math.floor(index / dimX))
     return { x: x, y: y }
   }
   getNeighborPattern(mode) {
@@ -297,17 +325,17 @@ class Grid {
     let pattern = this.getNeighborPattern(mode)
     
     pattern.forEach(p => {
-      let neighIndex = ((cy + p[1] + dim) % dim) * dim + ((cx + p[0] + dim) % dim)
+      let neighIndex = ((cy + p[1] + dimY) % dimY) * dimX + ((cx + p[0] + dimX) % dimX)
       indexes.push(neighIndex)
     })
     
     return indexes
   }
   getValue(cx, cy) {
-    if (cx < 0 || cx > dim || cy < 0 || cy > dim) {
+    if (cx < 0 || cx > dimX || cy < 0 || cy > dimY) {
       console.error("Grid.getValue() given cell indexes are out of range")
     }
-    let index = cy * dim + cx
+    let index = cy * dimX + cx
     return this.grid[index]
   }
   getScratchGrid() {
@@ -340,7 +368,7 @@ class Grid {
     let pattern = this.getNeighborPattern(mode)
     pattern.forEach(p => {
       // Get index of neighbor (careful close to edges)
-      let neighIndex = ((cy + p[1] + dim) % dim) * dim + ((cx + p[0] + dim) % dim)
+      let neighIndex = ((cy + p[1] + dimY) % dimY) * dimX + ((cx + p[0] + dimX) % dimX)
       
       // Get laplacian intensity & add to lap value
       let neighIntensity = this.grid[neighIndex] - intensity
@@ -360,7 +388,7 @@ class Grid {
     
     let pattern = this.getNeighborPattern(mode)
     pattern.forEach(p => {
-      let neighIndex = ((cy + p[1] + dim) % dim) * dim + ((cx + p[0] + dim) % dim)
+      let neighIndex = ((cy + p[1] + dimY) % dimY) * dimX + ((cx + p[0] + dimX) % dimX)
       let neighIntensity = this.grid[neighIndex] / pattern.length
       let neighVector = p
       grad.x += neighIntensity * neighVector[0] * cellSize
@@ -378,42 +406,43 @@ class Grid {
     this.grid[index] += val
   }
   setCellValue(cx, cy, val) {
-    if (cx < 0 || cx > dim || cy < 0 || cy > dim) {
+    if (cx < 0 || cx > dimX || cy < 0 || cy > dimY) {
       console.error("Grid.setCellValue() given cell indexes are out of range")
     }
-    let index = cy * dim + cx
+    let index = cy * dimX + cx
     this.grid[index] = val
   }
   printWallPattern(type) {
     // Big square in the middle
     if (type == 1) {
-      for (let cx = Math.floor(0.3 * dim); cx < Math.ceil(0.7 * dim); cx++) {
-        for (let cy = Math.floor(0.3 * dim); cy < Math.ceil(0.7 * dim); cy++) {
+      for (let cx = Math.floor(0.3 * dimX); cx < Math.ceil(0.7 * dimX); cx++) {
+        for (let cy = Math.floor(0.3 * dimY); cy < Math.ceil(0.7 * dimY); cy++) {
           this.setCellValue(cx, cy, 1)
         }
       }
     }
     // Thin vertical wall & single or double slit
     else if (type == 2 || type == 3) {
-      let wallWid = Math.floor(0.03 * dim)
-      let slitWid = Math.floor(0.03  * dim)
-      let slitsGap = Math.floor(0.25 * dim)
-      let slit1center = Math.floor(dim / 2) - Math.floor(slitsGap / 2)
-      let slit2center = Math.floor(dim / 2) + Math.floor(slitsGap / 2)
-      for (let cx = Math.floor(0.5 * dim) - wallWid; cx < Math.floor(0.5 * dim) + wallWid; cx++) {
+      let dimMin = Math.min(dimX, dimY)
+      let wallWid = Math.floor(0.03 * dimX)
+      let slitWid = Math.floor(0.03  * dimY)
+      let slitsGap = Math.floor(0.3 * dimY)
+      let slit1center = Math.floor(dimY / 2) - Math.floor(slitsGap / 2)
+      let slit2center = Math.floor(dimY / 2) + Math.floor(slitsGap / 2)
+      for (let cx = Math.floor(0.5 * dimX) - wallWid; cx < Math.floor(0.5 * dimX) + wallWid; cx++) {
         if (type == 2) {
           // Single slit
-          for (let cy = 0; cy < dim/2 - slitWid; cy++) {
+          for (let cy = 0; cy < dimY/2 - slitWid; cy++) {
             // Upper part
             this.setCellValue(cx, cy, 1)
             
             // Lower part
-            this.setCellValue(cx, dim - cy, 1)
+            this.setCellValue(cx, dimY - cy, 1)
           }
         }
         else if (type == 3) {
           // Double slit
-          for (let cy = 0; cy < dim; cy++) {
+          for (let cy = 0; cy < dimY; cy++) {
             let isWall1 = (cy < slit1center - slitWid)
             let isWall2 = ((cy > slit1center + slitWid) && (cy < slit2center - slitWid))
             let isWall3 = cy > slit2center + slitWid
@@ -430,16 +459,16 @@ class Grid {
       
       // Vertical
       for (let cx = 0; cx < cageWid; cx++) {
-        for (let cy = 0; cy < dim; cy++) {
+        for (let cy = 0; cy < dimY; cy++) {
           this.setCellValue(cx, cy, 1)
-          this.setCellValue(dim - cx, cy, 1)
+          this.setCellValue(dimX - cx, cy, 1)
         }
       }
       // Horizontal
       for (let cy = 0; cy < cageWid; cy++) {
-        for (let cx = 0; cx < dim; cx++) {
+        for (let cx = 0; cx < dimX; cx++) {
           this.setCellValue(cx, cy, 1)
-          this.setCellValue(cx, dim - cy, 1)
+          this.setCellValue(cx, dimY - cy, 1)
         }
       }
       
@@ -451,10 +480,10 @@ class Grid {
     const mode = params.modeName
     const cs = cellSize
 
-    for (let y = 0; y < dim; y++) {
+    for (let y = 0; y < dimY; y++) {
       const yOffset = y * cs
-      for (let x = 0; x < dim; x++) {
-        const index = y * dim + x
+      for (let x = 0; x < dimX; x++) {
+        const index = y * dimX + x
         const val = grid[index]
         let h = 0, s = 75, l = 50, a = 0.5
 
@@ -492,10 +521,10 @@ class Grid {
     const grid = this.grid
     const cs = cellSize
 
-    for (let y = 0; y < dim; y++) {
+    for (let y = 0; y < dimY; y++) {
       const yOffset = y * cs
-        for (let x = 0; x < dim; x++) {
-        const val = grid[y * dim + x]
+        for (let x = 0; x < dimX; x++) {
+        const val = grid[y * dimX + x]
         if (val == 1) {
           ctx.fillStyle = "black"
           ctx.fillRect(x * cs, yOffset, cs, cs)
@@ -514,7 +543,7 @@ class System {
     
     this.slidingGridChunkIndex = 0 // Sliding index to read grid with offset, without using more costly Grid value retrieving methods
     this.gridChunkForWorklet = null
-    this.gridChunkForFft = new Float32Array(dim * dim)
+    this.gridChunkForFft = new Float32Array(dimX * dimY)
   }
   getIntensityLaplacianWithWalls(cx, cy, mode) {
     let lap = 0
@@ -528,7 +557,7 @@ class System {
     let pattern = this.iGrid.getNeighborPattern(mode)
     pattern.forEach(p => {
       // Get index of neighbor (careful close to edges)
-      let neighIndex = ((cy + p[1] + dim) % dim) * dim + ((cx + p[0] + dim) % dim)
+      let neighIndex = ((cy + p[1] + dimY) % dimY) * dimX + ((cx + p[0] + dimX) % dimX)
       
       // Get laplacian intensity & add to lap value, use wall potential
       let neighWallValue = this.wGrid.grid[neighIndex]
@@ -579,8 +608,8 @@ class System {
     let visc3 = params.viscosity3 / 100
     
     // Check surrounding laplacian to increment value of variation (2nd order time derivative == intensity laplacian)
-    for (let cy = 0; cy < dim; cy++) {
-      for (let cx = 0; cx < dim; cx++) {
+    for (let cy = 0; cy < dimY; cy++) {
+      for (let cx = 0; cx < dimX; cx++) {
         // Δc(x,y)
         let intensityLaplacian = this.getIntensityLaplacianWithWalls(cx, cy, "moo1")
         
@@ -610,7 +639,7 @@ class System {
         // Physical viscosity of cube (prevents explosions)
         newValue += -visc3 * Math.pow(intensity, 3) * dtt / tau
         
-        let index = cy * dim + cx
+        let index = cy * dimX + cx
         newVgrid[index] = newValue
       }
     }
@@ -626,8 +655,8 @@ class System {
     let dtt = physicsStepMs * dt
     audioMetrics.iGridMax = 0
     
-    for (let cy = 0; cy < dim; cy++) {
-      for (let cx = 0; cx < dim; cx++) {
+    for (let cy = 0; cy < dimY; cy++) {
+      for (let cx = 0; cx < dimX; cx++) {
         // dc/dt(x,y)
         let variation = this.vGrid.getValue(cx, cy)
         
@@ -652,7 +681,7 @@ class System {
         // Detect max for audio
         if (Math.abs(newValue) > audioMetrics.iGridMax) audioMetrics.iGridMax = Math.abs(newValue)
         
-        let index = cy * dim + cx
+        let index = cy * dimX + cx
         newIgrid[index] = newValue
       }
     }
@@ -668,7 +697,7 @@ class System {
 
     let size = Math.ceil(deltaTms / 1000 * 44100)
     
-    const maxIndex = dim * dim
+    const maxIndex = dimX * dimY
 
     /*
     // 1. Calculate where this chunk is supposed to end
@@ -730,7 +759,7 @@ class System {
   }
   updateGridChunkForFft() {
     // Pass the whole grid
-    let size = dim * dim
+    let size = dimX * dimY
     this.gridChunkForFft = this.iGrid.grid.slice(0, size)
   }
 }
@@ -829,7 +858,7 @@ class Particle {
       // Use global injection parameter to scale how much energy is injected (special case for one of the modes where the left half injection is forced)
       let injectedNrjScale = params.particlesEnergyInjection / 5000
       
-      if (params.modeName == "slits" && (this.x < size / 2)) injectedNrjScale = 3000 / 5000
+      if (params.modeName == "slits" && (this.x < simW / 2)) injectedNrjScale = 3000 / 5000
       
       this.iGrid.grid[ind] += uPerNeigh * injectedNrjScale / Math.pow(params.population / 10, 0.5)
     })
@@ -861,8 +890,8 @@ class Particle {
     this.speed = Math.sqrt(dx * dx + dy * dy)
     
     // Periodic boundaries
-    this.x = (this.x + 10 * size) % size
-    this.y = (this.y + 10 * size) % size
+    this.x = (this.x + 10 * simW) % simW
+    this.y = (this.y + 10 * simH) % simH
   }
   draw() {
     // Dot
@@ -918,7 +947,7 @@ class UI {
     this.deltaTmsReadout = document.getElementById("delta-tms")
     this.deltaTmsValue = this.deltaTmsReadout ? this.deltaTmsReadout.querySelector(".value") : null
     this.audioHasBooted = false
-    this.virtualPointer = { x: size / 2, y: size / 2 }
+    this.virtualPointer = { x: simW / 2, y: simH / 2 }
     this.gamepad = gamepad
     this.updatePanelsMode(baseParams.modeName)
     this.updateDeltaTms()
@@ -939,13 +968,15 @@ class UI {
     }
   }
   updateVirtualPointer (xAxis, yAxis, deadzone) {
-    const center = size / 2
-    const maxCoord = size - 1e-6
+    const centerX = simW / 2
+    const centerY = simH / 2
+    const maxCoordX = simW - 1e-6
+    const maxCoordY = simH - 1e-6
     const amplitude = Math.sqrt(xAxis * xAxis + yAxis * yAxis)
     const prevX = this.virtualPointer.x
     const prevY = this.virtualPointer.y
-    const nextX = Math.min(maxCoord, Math.max(0, center + xAxis * center))
-    const nextY = Math.min(maxCoord, Math.max(0, center + yAxis * center))
+    const nextX = Math.min(maxCoordX, Math.max(0, centerX + xAxis * centerX))
+    const nextY = Math.min(maxCoordY, Math.max(0, centerY + yAxis * centerY))
 
     this.virtualPointer.x = nextX
     this.virtualPointer.y = nextY
@@ -964,7 +995,7 @@ class UI {
     // Mouse motion on grid
     let lastX, lastY
     can2.addEventListener("pointermove", ev => {
-      let x = ev.offsetX, y = ev.offsetY
+      let x = ev.offsetX * simW / wid, y = ev.offsetY * simH / hei
       if (lastX !== undefined && lastY !== undefined) {
         this.injectAlongPath(lastX, lastY, x, y)
       }
@@ -1256,7 +1287,7 @@ class Explaudio {
     this.gridFftAnalyser.fftSize = 256
     this.gridFftLength = this.gridFftAnalyser.frequencyBinCount
     this.gridFftData = new Float32Array(this.gridFftLength)
-    this.gridBuffer = this.audioCtx.createBuffer(1, dim * dim, this.audioCtx.sampleRate) // Contains grid data, updated
+    this.gridBuffer = this.audioCtx.createBuffer(1, dimX * dimY, this.audioCtx.sampleRate) // Contains grid data, updated
     
     // Grid FFT harmonic comb: connect FFT output to a chain of peaking filters (boosting only some freqs)
     
@@ -1796,8 +1827,8 @@ let particles
 let initParticles = (iGrid, vGrid, wGrid) => {
   particles = []
   for (let i = 0; i < params.population; i++) {
-    let x = size * Math.random(),
-        y = size * Math.random(),
+    let x = simW * Math.random(),
+        y = simH * Math.random(),
         u = 1 * Math.random(),
         theta = 2 * Math.random() * Math.PI
     
@@ -1809,8 +1840,6 @@ let initParticles = (iGrid, vGrid, wGrid) => {
 // Start
 let start = () => {
   updateModeParams()
-  dim = params.gridDimension
-  cellSize = size / dim
   ui.updatePanelsMode(params.modeName)
   initGrids()
   initSystem(iGrid, vGrid, wGrid)
@@ -1835,8 +1864,8 @@ let stepPhysics = () => {
   let rps = params.raindropsPerStep / 30
   let raindrops = rps > 1 ? rps : (Math.random() < rps ? 1 : 0)
   for (let r = 0; r < raindrops; r++) {
-    let randX = Math.random() * size
-    let randY = Math.random() * size
+    let randX = Math.random() * simW
+    let randY = Math.random() * simH
     iGrid.setValue(randX, randY, params.injectionAmplitude / 10)
   }
   
@@ -1891,7 +1920,7 @@ let update = () => {
   }
   if (stepsRun == maxPhysicsStepsPerFrame) physicsAccumulatorMs = 0 // device can't keep up; drop the backlog instead of spiraling
   
-  ctx2.clearRect(0, 0, size, size)
+  ctx2.clearRect(0, 0, simW, simH)
   
   // Draw particles (once per rendered frame, using the latest physics state)
   if (params.drawParticles) particles.forEach(p => p.draw())

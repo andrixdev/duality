@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1760" role="img" aria-labelledby="title description">
+  <title id="title">Duality function call flow</title>
+  <desc id="description">A call-flow chart for startup, the animation and simulation loops, audio, and keyboard, pointer, and gamepad input.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#8793aa"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#77aaff"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#73d5ad"/>
+    </marker>
+    <marker id="arrow-gold" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#f2c36b"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: Outfit, Arial, sans-serif; }
+    .title { font-size: 32px; font-weight: 700; fill: #fff; }
+    .subtitle { font-size: 15px; fill: #a5aab5; }
+    .section { font-size: 17px; font-weight: 700; fill: #dce2ee; letter-spacing: .7px; }
+    .node { fill: #20242e; stroke: #515c70; stroke-width: 1.5; }
+    .node-blue { fill: #1b2a3e; stroke: #5689c9; stroke-width: 1.5; }
+    .node-green { fill: #1b302c; stroke: #4da482; stroke-width: 1.5; }
+    .node-gold { fill: #332c1f; stroke: #b38a45; stroke-width: 1.5; }
+    .node-title { font-size: 15px; font-weight: 700; fill: #fff; text-anchor: middle; }
+    .node-title-small { font-size: 12px; font-weight: 700; fill: #fff; text-anchor: middle; }
+    .node-sub { font-size: 12px; fill: #c1c8d5; text-anchor: middle; }
+    .edge { fill: none; stroke: #8793aa; stroke-width: 2; marker-end: url(#arrow); }
+    .edge-blue { fill: none; stroke: #77aaff; stroke-width: 2; marker-end: url(#arrow-blue); }
+    .edge-green { fill: none; stroke: #73d5ad; stroke-width: 2; marker-end: url(#arrow-green); }
+    .edge-gold { fill: none; stroke: #f2c36b; stroke-width: 2; marker-end: url(#arrow-gold); }
+    .conditional { stroke-dasharray: 7 6; }
+    .label { font-size: 12px; fill: #a5aab5; }
+    .panel { fill: #16191f; stroke: #343b49; stroke-width: 1.5; }
+    .loop { fill: none; stroke: #77aaff; stroke-width: 2; marker-end: url(#arrow-blue); }
+  </style>
+
+  <rect width="1500" height="1760" fill="#0c0d10"/>
+  <rect x="22" y="18" width="1456" height="1724" rx="18" fill="#12151b" stroke="#343b49" stroke-width="2"/>
+  <text x="52" y="65" class="title">Duality — function call flow</text>
+  <text x="52" y="91" class="subtitle">Solid arrows show direct calls; dashed arrows show conditional paths or browser-driven callbacks. Repeated per-cell/per-particle work is grouped.</text>
+
+  <!-- Startup -->
+  <rect x="42" y="112" width="1416" height="276" rx="14" class="panel"/>
+  <text x="64" y="143" class="section">1 · SCRIPT STARTUP (in execution order)</text>
+
+  <rect x="70" y="173" width="190" height="68" rx="10" class="node"/>
+  <text x="165" y="201" class="node-title">script evaluation</text>
+  <text x="165" y="222" class="node-sub">definitions + globals</text>
+  <rect x="320" y="173" width="190" height="68" rx="10" class="node"/>
+  <text x="415" y="201" class="node-title">setup()</text>
+  <text x="415" y="222" class="node-sub">create canvases, contexts</text>
+  <rect x="570" y="173" width="225" height="68" rx="10" class="node"/>
+  <text x="682" y="201" class="node-title">new Gamepad()</text>
+  <text x="682" y="222" class="node-sub">initConnectionListeners()</text>
+  <rect x="855" y="173" width="250" height="68" rx="10" class="node"/>
+  <text x="980" y="201" class="node-title">new UI(gamepad)</text>
+  <text x="980" y="222" class="node-sub">update panels → initInteractions()</text>
+  <rect x="1165" y="173" width="245" height="68" rx="10" class="node-blue"/>
+  <text x="1287" y="201" class="node-title">start() · initial state</text>
+  <text x="1287" y="222" class="node-sub">configure mode + create simulation</text>
+  <path d="M260 207H312" class="edge"/>
+  <path d="M510 207H562" class="edge"/>
+  <path d="M795 207H847" class="edge"/>
+  <path d="M1105 207H1157" class="edge-blue"/>
+
+  <rect x="320" y="286" width="220" height="66" rx="10" class="node"/>
+  <text x="430" y="313" class="node-title">updateModeParams()</text>
+  <text x="430" y="334" class="node-sub">applyAutoPerformanceToParams()</text>
+  <rect x="640" y="286" width="195" height="66" rx="10" class="node"/>
+  <text x="737" y="313" class="node-title">initGrids()</text>
+  <text x="737" y="334" class="node-sub">construct 3 Grid objects</text>
+  <rect x="925" y="286" width="210" height="66" rx="10" class="node"/>
+  <text x="1030" y="313" class="node-title">initSystem()</text>
+  <text x="1030" y="334" class="node-sub">System → printWallPattern()</text>
+  <rect x="1220" y="286" width="190" height="66" rx="10" class="node"/>
+  <text x="1315" y="313" class="node-title">initParticles()</text>
+  <text x="1315" y="334" class="node-sub">construct population</text>
+  <path d="M1287 241V266H430V278" class="edge-blue"/>
+  <path d="M540 319H632" class="edge"/>
+  <path d="M835 319H917" class="edge"/>
+  <path d="M1135 319H1212" class="edge"/>
+  <text x="64" y="328" class="label">Then browser load</text>
+  <rect x="70" y="296" width="190" height="66" rx="10" class="node-gold"/>
+  <text x="165" y="323" class="node-title">load event</text>
+  <text x="165" y="344" class="node-sub">registered after startup</text>
+  <path d="M260 329H284V397H70V510H82" class="edge-gold conditional"/>
+  <text x="80" y="395" class="label">starts render loop</text>
+
+  <!-- Main loop -->
+  <rect x="42" y="408" width="1416" height="326" rx="14" class="panel"/>
+  <text x="64" y="439" class="section">2 · RENDERED FRAME LOOP</text>
+  <rect x="90" y="475" width="185" height="70" rx="10" class="node-blue"/>
+  <text x="182" y="503" class="node-title">frame()</text>
+  <text x="182" y="525" class="node-sub">requestAnimationFrame callback</text>
+  <rect x="355" y="475" width="185" height="70" rx="10" class="node-blue"/>
+  <text x="447" y="503" class="node-title">update()</text>
+  <text x="447" y="525" class="node-sub">measure elapsed frame time</text>
+  <rect x="625" y="475" width="245" height="70" rx="10" class="node-gold"/>
+  <text x="747" y="503" class="node-title">runStartupAutoPerformanceTuning()</text>
+  <text x="747" y="525" class="node-sub">sample frames; choose profile</text>
+  <rect x="990" y="475" width="200" height="70" rx="10" class="node-blue"/>
+  <text x="1090" y="503" class="node-title">stepPhysics()</text>
+  <text x="1090" y="525" class="node-sub">0–8 fixed ticks per frame</text>
+  <rect x="1270" y="475" width="145" height="70" rx="10" class="node-blue"/>
+  <text x="1342" y="503" class="node-title">draw + update</text>
+  <text x="1342" y="525" class="node-sub">render/audio/UI</text>
+  <path d="M275 510H347" class="edge-blue"/>
+  <path d="M540 510H617" class="edge-blue"/>
+  <path d="M870 510H982" class="edge-blue"/>
+  <path d="M1190 510H1262" class="edge-blue"/>
+
+  <rect x="610" y="602" width="270" height="70" rx="10" class="node-gold"/>
+  <text x="745" y="630" class="node-title">pickAutoPerformanceProfile()</text>
+  <text x="745" y="652" class="node-sub">on completion; restart via start() if needed</text>
+  <path d="M747 545V594" class="edge-gold conditional"/>
+
+  <rect x="1000" y="602" width="200" height="70" rx="10" class="node-blue"/>
+  <text x="1100" y="630" class="node-title">physics accumulator</text>
+  <text x="1100" y="652" class="node-sub">repeat while time ≥ 12 ms</text>
+  <path d="M1090 545V594" class="edge-blue"/>
+  <path d="M1100 602V563" class="loop"/>
+  <text x="1120" y="585" class="label">each tick</text>
+  <path d="M1342 545V700H182V553" class="loop"/>
+  <text x="765" y="718" class="label" text-anchor="middle">schedule next frame</text>
+  <text x="64" y="687" class="label">If auto-tuning returns true, update exits early; otherwise physics and drawing continue.</text>
+  <path d="M1090 545V745H65V857H82" class="edge-blue"/>
+
+  <!-- Simulation -->
+  <rect x="42" y="754" width="1416" height="435" rx="14" class="panel"/>
+  <text x="64" y="785" class="section">3 · FIXED PHYSICS TICK: stepPhysics()</text>
+  <rect x="90" y="820" width="205" height="74" rx="10" class="node-blue"/>
+  <text x="192" y="849" class="node-title">each Particle</text>
+  <text x="192" y="872" class="node-sub">interact()</text>
+  <rect x="390" y="820" width="205" height="74" rx="10" class="node"/>
+  <text x="492" y="849" class="node-title">Grid helpers</text>
+  <text x="492" y="872" class="node-sub">position, gradients, values</text>
+  <rect x="690" y="820" width="205" height="74" rx="10" class="node"/>
+  <text x="792" y="849" class="node-title">getNormalRandoms()</text>
+  <text x="792" y="872" class="node-sub">particle noise samples</text>
+  <rect x="990" y="820" width="205" height="74" rx="10" class="node"/>
+  <text x="1092" y="849" class="node-title">moveBy(dx, dy)</text>
+  <text x="1092" y="872" class="node-sub">update position / speed</text>
+  <rect x="1280" y="820" width="145" height="74" rx="10" class="node-gold"/>
+  <text x="1352" y="849" class="node-title">inject()</text>
+  <text x="1352" y="872" class="node-sub">if release threshold</text>
+  <path d="M295 857H382" class="edge-blue"/>
+  <path d="M595 857H682" class="edge"/>
+  <path d="M895 857H982" class="edge"/>
+  <path d="M1195 857H1272" class="edge-gold conditional"/>
+
+  <rect x="90" y="950" width="205" height="74" rx="10" class="node-blue"/>
+  <text x="192" y="979" class="node-title">system.updateGrids()</text>
+  <text x="192" y="1002" class="node-sub">after all particles</text>
+  <rect x="390" y="950" width="205" height="74" rx="10" class="node-blue"/>
+  <text x="492" y="979" class="node-title">updateVariationGrid()</text>
+  <text x="492" y="1002" class="node-sub">compute next variation</text>
+  <rect x="690" y="950" width="205" height="74" rx="10" class="node"/>
+  <text x="792" y="979" class="node-title">per-cell laplacian</text>
+  <text x="792" y="1002" class="node-sub">getIntensityLaplacianWithWalls()</text>
+  <rect x="990" y="950" width="205" height="74" rx="10" class="node-blue"/>
+  <text x="1092" y="979" class="node-title">updateIntensityGrid()</text>
+  <text x="1092" y="1002" class="node-sub">uses updated variation</text>
+  <rect x="1280" y="950" width="145" height="74" rx="10" class="node"/>
+  <text x="1352" y="979" class="node-title">Grid buffers</text>
+  <text x="1352" y="1002" class="node-sub">scratch → commit</text>
+  <path d="M295 987H382" class="edge-blue"/>
+  <path d="M595 987H682" class="edge-blue"/>
+  <path d="M895 987H982" class="edge"/>
+  <path d="M1195 987H1272" class="edge-blue"/>
+
+  <rect x="390" y="1080" width="205" height="70" rx="10" class="node-gold"/>
+  <text x="492" y="1108" class="node-title">rain injection</text>
+  <text x="492" y="1130" class="node-sub">optional Grid.setValue()</text>
+  <rect x="690" y="1080" width="205" height="70" rx="10" class="node"/>
+  <text x="792" y="1108" class="node-title">Grid.setValue()</text>
+  <text x="792" y="1130" class="node-sub">getGridIndex() → write cell</text>
+  <path d="M1352 1024V1040H285V1115H382" class="edge-gold conditional"/>
+  <path d="M595 1115H682" class="edge-gold"/>
+
+  <!-- Render and audio -->
+  <rect x="42" y="1209" width="1416" height="235" rx="14" class="panel"/>
+  <text x="64" y="1240" class="section">4 · PER-FRAME OUTPUT (after physics)</text>
+  <rect x="90" y="1275" width="205" height="75" rx="10" class="node-blue"/>
+  <text x="192" y="1304" class="node-title">Particle.draw()</text>
+  <text x="192" y="1327" class="node-sub">optional drawPartner()</text>
+  <rect x="390" y="1275" width="205" height="75" rx="10" class="node-blue"/>
+  <text x="492" y="1304" class="node-title">Grid.draw()</text>
+  <text x="492" y="1327" class="node-sub">optional intensity grid</text>
+  <rect x="690" y="1275" width="205" height="75" rx="10" class="node"/>
+  <text x="792" y="1304" class="node-title">Grid.wallDraw()</text>
+  <text x="792" y="1327" class="node-sub">draw wall cells</text>
+  <rect x="990" y="1275" width="205" height="75" rx="10" class="node-green"/>
+  <text x="1092" y="1304" class="node-title-small">updateGridChunkForAudioWorklet()</text>
+  <text x="1092" y="1327" class="node-sub">then audio.update()</text>
+  <rect x="1280" y="1275" width="145" height="75" rx="10" class="node-green"/>
+  <text x="1352" y="1304" class="node-title">UI update</text>
+  <text x="1352" y="1327" class="node-sub">updateDeltaTms()</text>
+  <path d="M295 1312H382" class="edge-blue"/>
+  <path d="M595 1312H682" class="edge-blue"/>
+  <path d="M895 1312H982" class="edge-green conditional"/>
+  <path d="M1195 1312H1272" class="edge-green"/>
+
+  <rect x="390" y="1370" width="240" height="52" rx="10" class="node-green"/>
+  <text x="510" y="1393" class="node-title">updateGridChunkForFft()</text>
+  <text x="510" y="1411" class="node-sub">audio.updateOscillatorBank()</text>
+  <path d="M1092 1350V1396H638" class="edge-green conditional"/>
+  <text x="648" y="1387" class="label">FFT path when step % 1 == 0</text>
+
+  <!-- Inputs -->
+  <rect x="42" y="1464" width="1416" height="250" rx="14" class="panel"/>
+  <text x="64" y="1495" class="section">5 · INPUT-DRIVEN CALLS (event callbacks can happen between frames)</text>
+  <rect x="80" y="1530" width="190" height="66" rx="10" class="node-gold"/>
+  <text x="175" y="1557" class="node-title">pointermove</text>
+  <text x="175" y="1578" class="node-sub">on canvas</text>
+  <rect x="330" y="1530" width="205" height="66" rx="10" class="node-gold"/>
+  <text x="432" y="1557" class="node-title">injectAlongPath()</text>
+  <text x="432" y="1578" class="node-sub">interpolate 4 points</text>
+  <rect x="595" y="1530" width="190" height="66" rx="10" class="node"/>
+  <text x="690" y="1557" class="node-title">Grid.addValue()</text>
+  <text x="690" y="1578" class="node-sub">→ getGridIndex()</text>
+  <path d="M270 1563H322" class="edge-gold"/>
+  <path d="M535 1563H587" class="edge-gold"/>
+
+  <rect x="80" y="1620" width="190" height="66" rx="10" class="node-gold"/>
+  <text x="175" y="1647" class="node-title">keyboard</text>
+  <text x="175" y="1668" class="node-sub">keydown / keyup</text>
+  <rect x="330" y="1620" width="455" height="66" rx="10" class="node-gold"/>
+  <text x="557" y="1644" class="node-title">keyup callbacks</text>
+  <text x="557" y="1662" class="node-sub">arrows → adjustActivePanel() → updatePanel()</text>
+  <text x="557" y="1678" class="node-sub">Q / W → cycleMode() → start()</text>
+  <rect x="855" y="1530" width="205" height="66" rx="10" class="node-green"/>
+  <text x="957" y="1557" class="node-title">keydown</text>
+  <text x="957" y="1578" class="node-sub">bootAudio() on first gesture</text>
+  <rect x="1110" y="1530" width="290" height="66" rx="10" class="node-green"/>
+  <text x="1255" y="1557" class="node-title">new Explaudio()</text>
+  <text x="1255" y="1578" class="node-sub">initAudioWorklet() → initBuses() → start()</text>
+  <path d="M270 1653H300V1653H322" class="edge-gold"/>
+  <path d="M300 1653V1563H847" class="edge-gold"/>
+  <path d="M1060 1563H1102" class="edge-green"/>
+  <text x="1160" y="1617" class="label">initBuses() calls initSinusoidalOrchestra()</text>
+
+  <rect x="855" y="1620" width="205" height="66" rx="10" class="node"/>
+  <text x="957" y="1647" class="node-title">gamepadconnected</text>
+  <text x="957" y="1668" class="node-sub">startGamepadLoop() → process…()</text>
+  <rect x="1110" y="1620" width="290" height="66" rx="10" class="node"/>
+  <text x="1255" y="1647" class="node-title">readButtons() / readJoysticks()</text>
+  <text x="1255" y="1668" class="node-sub">mode, panel, pointer callbacks</text>
+  <path d="M1060 1653H1102" class="edge"/>
+  <text x="80" y="1702" class="label">Gamepad callbacks route to cycleMode(), adjustActivePanel(), updateVirtualPointer() → injectAlongPath().</text>
+</svg>

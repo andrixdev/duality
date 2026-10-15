@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" role="img" aria-labelledby="title description">
+  <title id="title">Mode-by-mode audio configuration</title>
+  <desc id="description">A chart showing which audio outputs are enabled in each Duality simulation mode.</desc>
+  <style>
+    .title { font: 700 30px Outfit, Arial, sans-serif; fill: #ffffff; }
+    .subtitle { font: 400 16px Outfit, Arial, sans-serif; fill: #a5aab5; }
+    .header { font: 600 17px Outfit, Arial, sans-serif; fill: #dce2ee; }
+    .row-label { font: 600 18px Outfit, Arial, sans-serif; fill: #ffffff; }
+    .cell-text { font: 700 17px Outfit, Arial, sans-serif; text-anchor: middle; }
+  </style>
+
+  <rect width="960" height="480" fill="#0c0d10"/>
+  <rect x="24" y="20" width="912" height="450" rx="18" fill="#16171d" stroke="#3e4453" stroke-width="2"/>
+
+  <text x="54" y="66" class="title">Mode-by-mode audio configuration</text>
+  <text x="54" y="94" class="subtitle">Enabled output paths for each simulation mode</text>
+
+  <g transform="translate(54 126)">
+    <rect width="852" height="54" rx="8" fill="#252a35"/>
+    <text x="22" y="33" class="header">Mode</text>
+    <text x="300" y="26" class="header" text-anchor="middle">Particle</text>
+    <text x="300" y="45" class="header" text-anchor="middle">oscillator</text>
+    <text x="464" y="26" class="header" text-anchor="middle">Basic grid</text>
+    <text x="464" y="45" class="header" text-anchor="middle">sine</text>
+    <text x="628" y="33" class="header" text-anchor="middle">Raw grid</text>
+    <text x="776" y="26" class="header" text-anchor="middle">FFT</text>
+    <text x="776" y="45" class="header" text-anchor="middle">resynthesis</text>
+
+    <g transform="translate(0 66)">
+      <rect width="852" height="46" rx="8" fill="#1d2028"/>
+      <text x="22" y="33" class="row-label">Base</text>
+      <g class="cell-text">
+        <text x="300" y="33" fill="#737b8d">OFF</text>
+        <text x="464" y="33" fill="#737b8d">OFF</text>
+        <text x="628" y="33" fill="#737b8d">OFF</text>
+        <text x="776" y="33" fill="#75d6a4">ON</text>
+      </g>
+    </g>
+
+    <g transform="translate(0 120)">
+      <rect width="852" height="46" rx="8" fill="#1d2028"/>
+      <text x="22" y="33" class="row-label">Rain</text>
+      <g class="cell-text">
+        <text x="300" y="33" fill="#75d6a4">ON</text>
+        <text x="464" y="33" fill="#737b8d">OFF</text>
+        <text x="628" y="33" fill="#737b8d">OFF</text>
+        <text x="776" y="33" fill="#75d6a4">ON</text>
+      </g>
+    </g>
+
+    <g transform="translate(0 174)">
+      <rect width="852" height="46" rx="8" fill="#1d2028"/>
+      <text x="22" y="33" class="row-label">Constellations</text>
+      <g class="cell-text">
+        <text x="300" y="33" fill="#737b8d">OFF</text>
+        <text x="464" y="33" fill="#75d6a4">ON</text>
+        <text x="628" y="33" fill="#75d6a4">ON</text>
+        <text x="776" y="33" fill="#737b8d">OFF</text>
+      </g>
+    </g>
+
+    <g transform="translate(0 228)">
+      <rect width="852" height="46" rx="8" fill="#1d2028"/>
+      <text x="22" y="33" class="row-label">Bouncing</text>
+      <g class="cell-text">
+        <text x="300" y="33" fill="#737b8d">OFF</text>
+        <text x="464" y="33" fill="#737b8d">OFF</text>
+        <text x="628" y="33" fill="#75d6a4">ON</text>
+        <text x="776" y="33" fill="#737b8d">OFF</text>
+      </g>
+    </g>
+
+    <g transform="translate(0 282)">
+      <rect width="852" height="46" rx="8" fill="#1d2028"/>
+      <text x="22" y="33" class="row-label">Slits</text>
+      <g class="cell-text">
+        <text x="300" y="33" fill="#737b8d">OFF</text>
+        <text x="464" y="33" fill="#737b8d">OFF</text>
+        <text x="628" y="33" fill="#737b8d">OFF</text>
+        <text x="776" y="33" fill="#75d6a4">ON</text>
+      </g>
+    </g>
+  </g>
+</svg>
