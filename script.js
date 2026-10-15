@@ -125,6 +125,7 @@ let updateModeParams = () => {
     params.population = 3000
     params.drawParticlesPartners = true
     params.viscosity1 = 10
+    params.fieldDiffusion = 90
     
     // Audio
     params.audioEnableParticles = false
@@ -927,14 +928,14 @@ class Particle {
       let dist = Math.sqrt(Math.pow(partner.x - this.x, 2) + Math.pow(partner.y - this.y, 2))
       
       // Change partner if too far (or is myself), otherwise draw line
-      let sight = 75
+      let sight = Math.floor(Math.min(simW, simH) / 8)
       if (dist > sight || dist == 0) {
         this.partnerIndex = Math.floor(Math.random() * particles.length)
       } else {
         ctx2.beginPath()
         ctx2.moveTo(this.x, this.y)
         ctx2.lineTo(partner.x, partner.y)
-        ctx2.strokeStyle = "#FFF7"
+        ctx2.strokeStyle = "#FFFA"
         ctx2.lineWidth = 1
         ctx2.stroke()
         ctx2.closePath()
