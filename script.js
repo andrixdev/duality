@@ -87,13 +87,13 @@ let applyAutoPerformanceToParams = () => {
 let updateModeParams = () => {
   params = structuredClone(baseParams)
   if (mode == 6) {
-    // Playground 2 (same parameters as base)
+    // Poem
     params.modeName = "poem"
     params.fullModeName = "The Poem"
     params.wordsPerStep = 1
     params.pointerInjection = false
     params.fieldDiffusion = 3
-    params.particlesEnergyInjection = 5
+    params.particlesEnergyInjection = 15
     params.particlesGradCoupling = 500
     params.particlesSelfPropulsionSpeed = 20
 
@@ -102,6 +102,8 @@ let updateModeParams = () => {
     params.audioEnableBasicGrid = false
     params.audioEnableRawGrid = false
     params.audioEnableFft = true
+
+    params.audioFftGain *= 2
   }
   if (mode == 5) {
     // Slits
@@ -119,6 +121,8 @@ let updateModeParams = () => {
     params.audioEnableBasicGrid = false
     params.audioEnableRawGrid = false
     params.audioEnableFft = true
+
+    params.audioFftGain *= 0.4
   }
   if (mode == 4) {
     // Bouncing
@@ -1202,10 +1206,10 @@ class UI {
       this.panel1value.innerHTML = params.fieldDiffusion
     }
     else if (modeName == "poem") {
-      this.panel0name.innerHTML = "Field diffusion"
-      this.panel1name.innerHTML = "Word flow"
-      this.panel0value.innerHTML = params.fieldDiffusion
-      this.panel1value.innerHTML = params.wordsPerStep
+      this.panel0name.innerHTML = "Word flow"
+      this.panel1name.innerHTML = "Field diffusion"
+      this.panel0value.innerHTML = params.wordsPerStep
+      this.panel1value.innerHTML = params.fieldDiffusion
     }
     else if (modeName == "rain") {
       this.panel0name.innerHTML = "Rain intensity"
@@ -1244,8 +1248,8 @@ class UI {
     let maxValue = 1000
     
     let isEnergyInjection = ((modeName == "base" || modeName == "constellations" || modeName == "bouncing") && pIndex == 0) || (modeName == "slits" && pIndex == 1)
-    let isDiffusion = (modeName == "base" && pIndex == 1) || ((modeName == "slits" || modeName == "poem") && pIndex == 0)
-    let isWordQuantity = modeName == "poem" && pIndex == 1
+    let isDiffusion = (modeName == "base" && pIndex == 1) || (modeName == "slits" && pIndex == 0) || (modeName == "poem" && pIndex == 1)
+    let isWordQuantity = modeName == "poem" && pIndex == 0
     let isRainIntensity = modeName == "rain" && pIndex == 0
     let isRainQuantity = modeName == "rain" && pIndex == 1
     let isViscosity = modeName == "constellations" && pIndex == 1
