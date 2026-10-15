@@ -48,6 +48,10 @@ const baseParams = {
   audioEnableBasicGrid: false,
   audioEnableRawGrid: false,
   audioEnableFft: false,
+  audioParticlesGain: 0.6,
+  audioBasicGridGain: 0.75,
+  audioRawGridGain: 1,
+  audioFftGain: 0.75,
   modeName: "base",
   fullModeName: "The Playground"
 }
@@ -111,8 +115,8 @@ let updateModeParams = () => {
     // Audio
     params.audioEnableParticles = false
     params.audioEnableBasicGrid = false
-    params.audioEnableRawGrid = true
-    params.audioEnableFft = false
+    params.audioEnableRawGrid = false
+    params.audioEnableFft = true
   }
   if (mode == 3) {
     // Constellations
@@ -138,8 +142,8 @@ let updateModeParams = () => {
     // Audio
     params.audioEnableParticles = true
     params.audioEnableBasicGrid = false
-    params.audioEnableRawGrid = false
-    params.audioEnableFft = true
+    params.audioEnableRawGrid = true
+    params.audioEnableFft = false
   }
   if (mode == 1) {
     // Base
@@ -147,8 +151,8 @@ let updateModeParams = () => {
     params.fullModeName = "The Playground"
     
     // Audio
-    params.audioEnableParticles = false//true
-    params.audioEnableBasicGrid = false//true
+    params.audioEnableParticles = true
+    params.audioEnableBasicGrid = true
     params.audioEnableRawGrid = false
     params.audioEnableFft = true
     
@@ -1290,6 +1294,11 @@ class Explaudio {
     this.gridHighPassNode.Q.value = 0.707 // Standard smooth slope, no resonant peak
     this.gridHighPassNode.connect(this.gridLowPassNode)
     
+    // Raw grid signal gain (worklet output goes through it)
+    this.rawGridGainNode = this.audioCtx.createGain()
+    this.rawGridGainNode.gain.value = 0
+    this.rawGridGainNode.connect(this.gridHighPassNode)
+    
     // Grid FFT analyser and corresponding re-synthesis sinusoidal orchestra
     this.gridFftAnalyser = this.audioCtx.createAnalyser()
     this.gridFftAnalyser.fftSize = 256
@@ -1324,7 +1333,7 @@ class Explaudio {
     
     // Init FFT re-synthesized orchestra
     this.oscBankMasterGain = this.audioCtx.createGain()
-    this.oscBankMasterGain.gain.value = 0.25
+    this.oscBankMasterGain.gain.value = 0.2 * params.audioFftGain
     //this.oscBankMasterGain.connect(this.combGainNode)
     this.oscBankMasterGain.connect(this.gridLowPassNode)
     
@@ -1333,7 +1342,7 @@ class Explaudio {
     // Grid audio worklet
     this.audioCtx.audioWorklet.addModule(this.audioWorkletUrl).then(() => {
       this.gridValuesNode = new AudioWorkletNode(this.audioCtx, "grid-audio-interpreter")
-      this.gridValuesNode.connect(this.gridHighPassNode)
+      this.gridValuesNode.connect(this.rawGridGainNode)
     }).catch(err => {
       console.error("Failed to load worklet:", err)
     })
@@ -1414,8 +1423,10 @@ class Explaudio {
   }
   update(gridChunkForWorklet) {
     // Update gains
-    this.particlesGainNode.gain.value = params.audioEnableParticles ? 0.01 : 0
-    this.gridOscillatorGainNode.gain.value = params.audioEnableBasicGrid ? 0.125 : 0
+    this.particlesGainNode.gain.value = params.audioEnableParticles ? 0.02 * params.audioParticlesGain : 0
+    this.gridOscillatorGainNode.gain.value = params.audioEnableBasicGrid ? 0.1 * params.audioBasicGridGain : 0
+    this.rawGridGainNode.gain.value = params.audioEnableRawGrid ? params.audioRawGridGain : 0
+    this.oscBankMasterGain.gain.value = 0.2 * params.audioFftGain
     
     // Particles oscillator
     let particlesFreq = Math.min(10000, audioMetrics.particlesTotalSpeed * .5)
