@@ -51,7 +51,7 @@ canvas {
   bottom: 0;
   margin: auto;
   width: var(--wid);
-  height: 150px;
+  height: 120px;
   z-index: 10;
   color: white;
   text-align: center;
@@ -64,12 +64,6 @@ canvas {
     display: flex;
     flex-flow: column;
     justify-content: center;
-    transform-origin: center center;
-    transition: transform 220ms ease;
-    
-    &.active {
-      transform: scale(1.3);
-    }
     
     &:not(.active) .control p {
       opacity: 0.5;
@@ -78,48 +72,18 @@ canvas {
     .control {
       
       p {
-        margin: .5em 0 -.75em;
+        line-height: .75em;
+        margin: .5em 0;
         text-shadow: black 0 0 5px;
         font-size: 1.25rem;
         transition: opacity 300ms;
         
         &.value {
           font-size: 1.75rem;
-
         }
       }
     }
   }
-}
-
-.delta-tms {
-  position: fixed;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  z-index: 30;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.5rem 0.8rem;
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 999px;
-  background: rgba(2, 4, 12, 0.55);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.28);
-  color: white;
-  font-family: "Quintessential", "Outfit", sans-serif;
-  letter-spacing: 0.04em;
-}
-
-.delta-tms .label {
-  opacity: 0.75;
-  font-size: 0.8rem;
-  text-transform: lowercase;
-}
-
-.delta-tms .value {
-  font-size: 1rem;
-  font-weight: 600;
 }
 
 #guide-overlay {
@@ -130,11 +94,16 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: row;
   pointer-events: none;
 }
 
+.gamepad-guide + .gamepad-guide {
+  margin-left: -1vw;
+}
+
 .gamepad-guide {
-  width: min(800px, 90vw);
+  width: min(800px, 48vw);
   height: auto;
 }
 

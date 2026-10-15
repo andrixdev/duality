@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="130 0 770 500" width="100%" height="100%">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <style>
+    .callout { font-family: 'Outfit', sans-serif; font-size: 24px; fill: #ffffff; font-weight: 600; letter-spacing: 0.5px; }
+    .subtext { font-family: 'Outfit', sans-serif; font-size: 18px; fill: #a5aab5; font-weight: 400; }
+    .line { stroke: #cad1df; stroke-width: 2; fill: none; stroke-dasharray: 6 6; }
+    .dot { fill: #cad1df; }
+    .board { fill: #16171d; stroke: #3e4453; stroke-width: 3; filter: url(#shadow); }
+    .key { fill: #0b0c0f; stroke: #2d313b; stroke-width: 2; }
+    .hkey { fill: #7b8193; stroke: rgb(219, 224, 238); stroke-width: 3; }
+    .bkey { fill: #ac2f3c; stroke: rgb(219, 224, 238); stroke-width: 3; }
+    .klabel { font-family: sans-serif; font-size: 22px; font-weight: bold; fill: #ffffff; text-anchor: middle; }
+  </style>
+
+  <!-- Keyboard base -->
+  <rect x="150" y="140" width="500" height="260" rx="24" class="board"/>
+
+  <!-- Dimmed background keys (top row) -->
+  <g class="key">
+    <rect x="300" y="165" width="50" height="50" rx="8"/>
+    <rect x="460" y="165" width="50" height="50" rx="8"/>
+    <rect x="520" y="165" width="50" height="50" rx="8"/>
+    <rect x="580" y="165" width="50" height="50" rx="8"/>
+  </g>
+
+  <!-- A Z -->
+  <rect x="180" y="165" width="50" height="50" rx="8" class="hkey"/>
+  <text x="205" y="198" class="klabel">A</text>
+  <rect x="240" y="165" width="50" height="50" rx="8" class="hkey"/>
+  <text x="265" y="198" class="klabel">Z</text>
+
+  <!-- B -->
+  <rect x="400" y="225" width="50" height="50" rx="8" class="bkey"/>
+  <text x="425" y="258" class="klabel">B</text>
+
+  <!-- Dimmed middle keys -->
+  <g class="key">
+    <rect x="190" y="225" width="50" height="50" rx="8"/>
+    <rect x="250" y="225" width="50" height="50" rx="8"/>
+    <rect x="310" y="225" width="50" height="50" rx="8"/>
+    <rect x="460" y="225" width="50" height="50" rx="8"/>
+    <rect x="520" y="225" width="50" height="50" rx="8"/>
+    <rect x="580" y="225" width="50" height="50" rx="8"/>
+  </g>
+
+  <!-- Space bar -->
+  <rect x="220" y="290" width="240" height="44" rx="8" class="key"/>
+
+  <!-- Arrow keys -->
+  <rect x="520" y="290" width="50" height="44" rx="8" class="hkey"/>
+  <path d="M 545 300 L 535 322 L 555 322 Z" fill="#fff"/>
+  <rect x="460" y="344" width="50" height="44" rx="8" class="hkey"/>
+  <path d="M 475 366 L 497 356 L 497 376 Z" fill="#fff"/>
+  <rect x="520" y="344" width="50" height="44" rx="8" class="hkey"/>
+  <path d="M 535 356 L 555 356 L 545 378 Z" fill="#fff"/>
+  <rect x="580" y="344" width="50" height="44" rx="8" class="hkey"/>
+  <path d="M 595 356 L 595 376 L 617 366 Z" fill="#fff"/>
+
+  <!-- Mouse (outside keyboard) -->
+  <g transform="translate(750, 270)">
+    <rect x="-55" y="-80" width="110" height="160" rx="50" class="hkey" style="filter: url(#shadow)"/>
+    <line x1="-55" y1="-20" x2="55" y2="-20" stroke="#0b0c0f" stroke-width="3"/>
+    <line x1="0" y1="-80" x2="0" y2="-20" stroke="#0b0c0f" stroke-width="3"/>
+    <rect x="-8" y="-62" width="16" height="30" rx="8" fill="#0b0c0f"/>
+  </g>
+
+  <!-- A callout -->
+  <text x="205" y="40" class="callout" text-anchor="middle">A</text>
+  <text x="205" y="70" class="subtext" text-anchor="middle">Previous Mode</text>
+  <polyline points="205,80 205,160" class="line" />
+  <circle cx="205" cy="160" r="4" class="dot" />
+
+  <!-- Z callout -->
+  <text x="385" y="40" class="callout" text-anchor="middle">Z</text>
+  <text x="385" y="70" class="subtext" text-anchor="middle">Next Mode</text>
+  <polyline points="385,80 385,105 265,120 265,160" class="line" />
+  <circle cx="265" cy="160" r="4" class="dot" />
+
+  <!-- B callout -->
+  <text x="535" y="40" class="callout" text-anchor="middle">B</text>
+  <text x="535" y="70" class="subtext" text-anchor="middle">Toggle Guide</text>
+  <polyline points="535,80 535,120 455,235" class="line" />
+  <circle cx="452" cy="236" r="4" class="dot" />
+
+  <!-- Mouse callout -->
+  <text x="750" y="40" class="callout" text-anchor="middle">Mouse</text>
+  <text x="750" y="70" class="subtext" text-anchor="middle">Move Pointer &amp; Inject</text>
+  <polyline points="750,80 750,185" class="line" />
+  <circle cx="750" cy="190" r="4" class="dot" />
+
+  <!-- Left / Right callout -->
+  <text x="250" y="450" class="callout">Left / Right</text>
+  <text x="250" y="480" class="subtext">Choose Parameter</text>
+  <polyline points="410,455 485,455 485,392" class="line" />
+  <circle cx="485" cy="390" r="4" class="dot" />
+
+  <!-- Up / Down callout -->
+  <text x="600" y="450" class="callout">Up / Down</text>
+  <text x="600" y="480" class="subtext">Adjust Parameter</text>
+  <polyline points="590,455 545,455 545,392" class="line" />
+  <circle cx="545" cy="390" r="4" class="dot" />
+</svg>
