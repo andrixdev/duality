@@ -4,10 +4,10 @@
  * (careful with your precious ears, turn sound low)
  */
 
-let mode = 1 // 1 to 5
+let mode = 1 // 1 to 6
 
 let cycleMode = (step) => {
-  const modes = 5
+  const modes = 6
   mode = ((mode - 1 + step + modes) % modes) + 1
   start()
 }
@@ -24,7 +24,9 @@ const baseParams = {
   numericalIntensityViscosity: 0, // η_i Numerical relaxation 1
   numericalVariationViscosity: 0, // η_v Numerical relaxation 2
   injectionAmplitude: 1, // Mouse/rain injection
+  pointerInjection: true, // Whether moving the pointer injects intensity
   raindropsPerStep: 0, // Spontaneous random injection on grid (raindrops)
+  wordsPerStep: 0, // Random words (pixel letters) added on the intensity grid (per 1000 steps)
   particlesPosDiffusion: 0, // Dp - Brownian position
   particlesRotDiffusion: .1, // Dr - Brownian rotation
   particlesSelfPropulsionSpeed: 0, // v0 - Self propulsion speed
@@ -84,6 +86,23 @@ let applyAutoPerformanceToParams = () => {
 }
 let updateModeParams = () => {
   params = structuredClone(baseParams)
+  if (mode == 6) {
+    // Playground 2 (same parameters as base)
+    params.modeName = "poem"
+    params.fullModeName = "The Poem"
+    params.wordsPerStep = 1
+    params.pointerInjection = false
+    params.fieldDiffusion = 3
+    params.particlesEnergyInjection = 5
+    params.particlesGradCoupling = 500
+    params.particlesSelfPropulsionSpeed = 20
+
+    // Audio
+    params.audioEnableParticles = false
+    params.audioEnableBasicGrid = false
+    params.audioEnableRawGrid = false
+    params.audioEnableFft = true
+  }
   if (mode == 5) {
     // Slits
     params.modeName = "slits"
@@ -225,6 +244,68 @@ let deltaTms = 20 // last measured real frame time (ms) - drives audio pacing & 
 const physicsStepMs = 12 // fixed physics timestep (ms), kept below the scheme's stability threshold on any device
 const maxPhysicsStepsPerFrame = 8 // safety cap so a slow device catches up gradually instead of spiraling
 let physicsAccumulatorMs = 0
+let activeGlyphs = [] // Pixel letters currently injecting (mode "poem")
+const glyphLifetimeSteps = 600 // How many physics steps a letter persists
+const glyphWidth = 5
+const pixelFont = {
+  a: ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
+  b: ["11110", "10001", "10001", "11110", "10001", "10001", "11110"],
+  c: ["01110", "10001", "10000", "10000", "10000", "10001", "01110"],
+  d: ["11110", "10001", "10001", "10001", "10001", "10001", "11110"],
+  e: ["11111", "10000", "10000", "11110", "10000", "10000", "11111"],
+  f: ["11111", "10000", "10000", "11110", "10000", "10000", "10000"],
+  g: ["01110", "10001", "10000", "10111", "10001", "10001", "01111"],
+  h: ["10001", "10001", "10001", "11111", "10001", "10001", "10001"],
+  i: ["01110", "00100", "00100", "00100", "00100", "00100", "01110"],
+  j: ["00111", "00010", "00010", "00010", "00010", "10010", "01100"],
+  k: ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
+  l: ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
+  m: ["10001", "11011", "10101", "10101", "10001", "10001", "10001"],
+  n: ["10001", "11001", "10101", "10011", "10001", "10001", "10001"],
+  o: ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+  p: ["11110", "10001", "10001", "11110", "10000", "10000", "10000"],
+  q: ["01110", "10001", "10001", "10001", "10101", "10010", "01101"],
+  r: ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
+  s: ["01111", "10000", "10000", "01110", "00001", "00001", "11110"],
+  t: ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+  u: ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+  v: ["10001", "10001", "10001", "10001", "10001", "01010", "00100"],
+  w: ["10001", "10001", "10001", "10101", "10101", "11011", "10001"],
+  x: ["10001", "10001", "01010", "00100", "01010", "10001", "10001"],
+  y: ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
+  z: ["11111", "00001", "00010", "00100", "01000", "10000", "11111"]
+}
+const pixelFontLetters = Object.keys(pixelFont)
+// Lowercase letters share the uppercase baseline (row 6); descenders go down to row 8
+const pixelFontPad = ["00000", "00000"]
+const pixelFontLower = {
+  a: [...pixelFontPad, "01110", "00001", "01111", "10001", "01111"],
+  b: ["10000", "10000", "10110", "11001", "10001", "10001", "11110"],
+  c: [...pixelFontPad, "01110", "10001", "10000", "10001", "01110"],
+  d: ["00001", "00001", "01101", "10011", "10001", "10001", "01111"],
+  e: [...pixelFontPad, "01110", "10001", "11111", "10000", "01110"],
+  f: ["00110", "01001", "01000", "11100", "01000", "01000", "01000"],
+  g: [...pixelFontPad, "01111", "10001", "10001", "10001", "01111", "00001", "01110"],
+  h: ["10000", "10000", "10110", "11001", "10001", "10001", "10001"],
+  i: ["00100", "00000", "01100", "00100", "00100", "00100", "01110"],
+  j: ["00010", "00000", "00110", "00010", "00010", "00010", "00010", "10010", "01100"],
+  k: ["10000", "10000", "10010", "10100", "11000", "10100", "10010"],
+  l: ["01100", "00100", "00100", "00100", "00100", "00100", "01110"],
+  m: [...pixelFontPad, "11010", "10101", "10101", "10101", "10101"],
+  n: [...pixelFontPad, "10110", "11001", "10001", "10001", "10001"],
+  o: [...pixelFontPad, "01110", "10001", "10001", "10001", "01110"],
+  p: [...pixelFontPad, "10110", "11001", "10001", "10001", "11110", "10000", "10000"],
+  q: [...pixelFontPad, "01101", "10011", "10001", "10001", "01111", "00001", "00001"],
+  r: [...pixelFontPad, "10110", "11001", "10000", "10000", "10000"],
+  s: [...pixelFontPad, "01111", "10000", "01110", "00001", "11110"],
+  t: ["01000", "01000", "11110", "01000", "01000", "01001", "00110"],
+  u: [...pixelFontPad, "10001", "10001", "10001", "10011", "01101"],
+  v: [...pixelFontPad, "10001", "10001", "10001", "01010", "00100"],
+  w: [...pixelFontPad, "10001", "10101", "10101", "10101", "01010"],
+  x: [...pixelFontPad, "10001", "01010", "00100", "01010", "10001"],
+  y: [...pixelFontPad, "10001", "10001", "10001", "01111", "00001", "00001", "01110"],
+  z: [...pixelFontPad, "11111", "00010", "00100", "01000", "11111"]
+}
 let lastFrameTime = null
 let cellSize = Math.max(wid, hei) / Math.max(dimX, dimY)
 // Simulation domain is exactly dimX x dimY square cells; it is stretched on screen only (canvas transform) so it fills the whole canvas
@@ -416,6 +497,16 @@ class Grid {
     let index = this.getGridIndex(x, y)
     this.grid[index] += val
   }
+  addGlyph(cx0, cy0, rows, val) {
+    for (let j = 0; j < rows.length; j++) {
+      for (let i = 0; i < rows[j].length; i++) {
+        if (rows[j][i] != "1") continue
+        let cx = (cx0 + i) % dimX
+        let cy = (cy0 + j) % dimY
+        this.grid[cy * dimX + cx] += val
+      }
+    }
+  }
   setCellValue(cx, cy, val) {
     if (cx < 0 || cx > dimX || cy < 0 || cy > dimY) {
       console.error("Grid.setCellValue() given cell indexes are out of range")
@@ -498,11 +589,11 @@ class Grid {
         const val = grid[index]
         let h = 0, s = 75, l = 50, a = 0.5
 
-        if (mode == "base" || mode == "bouncing") {
+        if (mode == "base" || mode == "poem" || mode == "bouncing") {
           const minU = 0, maxU = 1
           const vv = Math.min(1, Math.max(0, (val - minU) / (maxU - minU)))
           const v = 100 * Math.sqrt(Math.sqrt(vv))
-          const sensitivity = mode == "base" ? 1 : 2
+          const sensitivity = (mode == "base" || mode == "poem") ? 1 : 2
           h = 250 + 2 * v * sensitivity
           l = v * sensitivity
         } else if (mode == "rain") {
@@ -972,6 +1063,7 @@ class UI {
     }
   }
   injectAlongPath (fromX, fromY, toX, toY) {
+    if (!params.pointerInjection) return
     const halts = 4
     for (let h = 1; h <= halts; h++) {
       let haltX = fromX + h / halts * (toX - fromX)
@@ -1093,6 +1185,12 @@ class UI {
       this.panel0value.innerHTML = params.particlesEnergyInjection
       this.panel1value.innerHTML = params.fieldDiffusion
     }
+    else if (modeName == "poem") {
+      this.panel0name.innerHTML = "Field diffusion"
+      this.panel1name.innerHTML = "Word flow"
+      this.panel0value.innerHTML = params.fieldDiffusion
+      this.panel1value.innerHTML = params.wordsPerStep
+    }
     else if (modeName == "rain") {
       this.panel0name.innerHTML = "Rain intensity"
       this.panel1name.innerHTML = "Rain quantity"
@@ -1130,7 +1228,8 @@ class UI {
     let maxValue = 1000
     
     let isEnergyInjection = ((modeName == "base" || modeName == "constellations" || modeName == "bouncing") && pIndex == 0) || (modeName == "slits" && pIndex == 1)
-    let isDiffusion = (modeName == "base" && pIndex == 1) || (modeName == "slits" && pIndex == 0)
+    let isDiffusion = (modeName == "base" && pIndex == 1) || ((modeName == "slits" || modeName == "poem") && pIndex == 0)
+    let isWordQuantity = modeName == "poem" && pIndex == 1
     let isRainIntensity = modeName == "rain" && pIndex == 0
     let isRainQuantity = modeName == "rain" && pIndex == 1
     let isViscosity = modeName == "constellations" && pIndex == 1
@@ -1156,6 +1255,11 @@ class UI {
     // Rain quantity
     else if (isRainQuantity) {
       value = params.raindropsPerStep
+      maxValue = 100
+    }
+    // Word quantity
+    else if (isWordQuantity) {
+      value = params.wordsPerStep
       maxValue = 100
     }
     // Viscosity
@@ -1193,6 +1297,9 @@ class UI {
     }
     else if (isRainQuantity) {
       params.raindropsPerStep = newValue
+    }
+    else if (isWordQuantity) {
+      params.wordsPerStep = newValue
     }
     else if (isViscosity) {
       params.viscosity1 = newValue
@@ -1831,6 +1938,7 @@ let iGrid
 let vGrid
 let wGrid
 let initGrids = () => {
+  activeGlyphs = []
   iGrid = new Grid(0) // intensity grid
   vGrid = new Grid(0) // variation grid
   wGrid = new Grid(0) // wall grid
@@ -1888,6 +1996,30 @@ let stepPhysics = () => {
     let randY = Math.random() * simH
     iGrid.setValue(randX, randY, params.injectionAmplitude / 10)
   }
+  
+  // Randomly spawn words (pixel letters) that keep injecting intensity while they persist
+  let wps = params.wordsPerStep / 500
+  let words = wps > 1 ? wps : (Math.random() < wps ? 1 : 0)
+  for (let s = 0; s < words; s++) {
+    let cx0 = Math.floor(Math.random() * dimX)
+    let cy0 = Math.floor(Math.random() * dimY)
+    // Random word of 3 to 10 random letters, only the first one in uppercase
+    let wordLength = 3 + Math.floor(Math.random() * 8)
+    for (let k = 0; k < wordLength; k++) {
+      let letter = pixelFontLetters[Math.floor(Math.random() * pixelFontLetters.length)]
+      activeGlyphs.push({
+        cx0: cx0 + k * (glyphWidth + 1),
+        cy0: cy0,
+        rows: (k == 0 ? pixelFont : pixelFontLower)[letter],
+        stepsLeft: glyphLifetimeSteps
+      })
+    }
+  }
+  activeGlyphs = activeGlyphs.filter(g => {
+    iGrid.addGlyph(g.cx0, g.cy0, g.rows, params.injectionAmplitude / 700)
+    g.stepsLeft--
+    return g.stepsLeft > 0
+  })
   
   // Increment main step counter
   step++
