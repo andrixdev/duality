@@ -14,7 +14,7 @@ let cycleMode = (step) => {
 
 // Common base for exposed parameters
 const baseParams = {
-  gridDimension: 150, // dim - Ready for some CPU sweat?
+  gridDimension: 100, // dim - Ready for some CPU sweat?
   responsive: true,
   population: 2000, // pop - Particles population
   fieldDiffusion: 30, // Dp - Amplitude of diffusion
@@ -1060,6 +1060,8 @@ class UI {
     if (!this.audioHasBooted) {
       audio = new Explaudio()
       this.audioHasBooted = true
+    } else if (audio && audio.audioCtx.state === "suspended") {
+      audio.audioCtx.resume().catch(() => {})
     }
   }
   injectAlongPath (fromX, fromY, toX, toY) {
@@ -1106,6 +1108,15 @@ class UI {
       lastX = x
       lastY = y
     })
+
+    document.addEventListener("visibilitychange", () => {
+      if (!audio || !audio.audioCtx) return
+      if (document.hidden) audio.audioCtx.suspend().catch(() => {})
+      else audio.audioCtx.resume().catch(() => {})
+    })
+
+    window.addEventListener("pointerdown", () => this.bootAudio())
+    window.addEventListener("click", () => this.bootAudio())
 
     window.addEventListener("keydown", ev => {
       this.bootAudio()
@@ -1155,7 +1166,8 @@ class UI {
     })
 
     this.gamepad.setInteractionHandler(() => {
-      // Audio engine requires explicit user gesture across window, not joystick touches
+      // Best effort: some browsers count gamepad presses as user activation
+      this.bootAudio()
     })
     this.gamepad.setLeftJoystickHandler((xAxis, yAxis, deadzone) => {
       this.updateVirtualPointer(xAxis, yAxis, deadzone)
@@ -1316,6 +1328,7 @@ class UI {
 class Explaudio {
   constructor() {
     this.audioCtx = new AudioContext()
+    if (this.audioCtx.state === "suspended") this.audioCtx.resume().catch(() => {})
     this.initAudioWorklet()
     this.initBuses()
     this.start()
