@@ -253,3 +253,43 @@ details.notes {
   color: hsl(160, 50%, 65%);
 }
 
+/* Project history */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.25rem;
+  border-left: 1px solid rgba(255,255,255,0.2);
+
+  li {
+    position: relative;
+    margin-bottom: 1.25rem;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: calc(-1.25rem - 4px);
+      top: 0.55rem;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: hsl(220, 55%, 80%);
+    }
+  }
+  h3 {
+    margin: 0;
+    font-family: "Quintessential", "Outfit", sans-serif;
+    font-weight: 400;
+    font-size: 1.15rem;
+  }
+  p {
+    margin: 0.25rem 0 0;
+  }
+  .date {
+    margin: 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: hsl(220, 55%, 80%);
+  }
+}
+
