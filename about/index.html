@@ -306,6 +306,65 @@
       </section>
 
       <section>
+        <details class="notes">
+          <summary>Notes and code: where they differ</summary>
+          <div class="details-body">
+            <p>
+              The equations above follow the code. The original handwritten notes of the model differ from it on a few
+              points:
+            </p>
+            <ol>
+              <li>
+                <span class="tag tag-discuss">To discuss</span>
+                <strong>Energy coupling.</strong> The notes charge a particle with \(\lambda\,c\), the code with
+                \(\lambda\,|c|\). With the absolute value, a particle also gains energy in the troughs of the field, so
+                it charges up wherever the field is agitated, not only where it is positive.
+              </li>
+              <li>
+                <span class="tag tag-minor">Non-critical</span>
+                <strong>Threshold law.</strong> The notes write the new threshold as \(\alpha + (1-\alpha)(-\ln U)\), the
+                code as \(\alpha(-\ln U) + (1-\alpha)\). The role of \(\alpha\) is simply mirrored: in the code,
+                \(\alpha = 0\) gives a fixed threshold and \(\alpha = 1\) a fully random one.
+              </li>
+              <li>
+                <span class="tag tag-minor">Non-critical</span>
+                <strong>Wall smoothing.</strong> The notes smooth the wall field iteratively into a staircase going from
+                1 inside walls to 0 outside. In the code, \(w\) is strictly 0 or 1, so the wall force only acts at the
+                edge of walls.
+              </li>
+              <li>
+                <span class="tag tag-perf">Adaptive performance</span>
+                <strong>Machine time.</strong> The notes scale each step by the frame duration,
+                \(dt' = dt \times \Delta T_{image}\), so that time flows linearly whatever the frame rate. The code now
+                uses a fixed physics step of 12&nbsp;ms instead, and runs as many steps per frame as the elapsed time
+                requires. The physics remains coherent:
+                <ul>
+                  <li>
+                    Every step applies exactly the same discrete equations, so the dynamics no longer depend on the
+                    device. A variable \(dt'\) could exceed the stability limit of the scheme on a slow device.
+                  </li>
+                  <li>
+                    When a device cannot keep up, even with 8 steps per frame, the backlog is dropped: the simulation runs
+                    slower than real time, but it stays correct in simulation time.
+                  </li>
+                  <li>
+                    At startup, slow devices get a coarser grid and fewer particles. Cells become larger, but the
+                    Laplacian is computed in screen units (\(r_0\) is the cell size), so \(D_c\) keeps the same meaning
+                    and waves travel the same screen distances, with less detail.
+                  </li>
+                  <li>
+                    The injection of each particle is divided by \(\sqrt{N/10}\) for a population \(N\), so with fewer
+                    particles the total energy fed into the field decreases as \(\sqrt N\), not as \(N\). The light
+                    profiles look somewhat calmer, but they are not identical to the full simulation.
+                  </li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </details>
+      </section>
+
+      <section>
         <h2>The art</h2>
         <p>
           Duality is not a scientific simulation in the strict sense. The equations are real, but the

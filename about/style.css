@@ -207,3 +207,49 @@ table {
   }
 }
 
+/* Notes vs code: warm-tinted block to set it apart from the technical details */
+details.notes {
+  margin-top: 0;
+  border-color: hsla(30, 70%, 60%, 0.35);
+  background: hsla(25, 60%, 14%, 0.55);
+
+  summary {
+    color: hsl(35, 80%, 75%);
+
+    &:hover, &:focus-visible {
+      color: white;
+    }
+  }
+  ol {
+    padding-left: 1.25rem;
+  }
+  li {
+    margin-bottom: 0.9rem;
+  }
+  ul li {
+    margin: 0.4rem 0 0;
+  }
+  strong {
+    font-weight: 500;
+    color: white;
+  }
+}
+.tag {
+  display: inline-block;
+  margin-right: 0.4rem;
+  padding: 0 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  border: 1px solid currentColor;
+}
+.tag-discuss {
+  color: hsl(350, 85%, 75%);
+}
+.tag-minor {
+  color: hsl(220, 20%, 70%);
+}
+.tag-perf {
+  color: hsl(160, 50%, 65%);
+}
+
