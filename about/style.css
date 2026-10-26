@@ -1,0 +1,124 @@
+html {
+  background: #02040c;
+  color: white;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Outfit", sans-serif;
+  font-weight: 300;
+  line-height: 1.65;
+}
+/* Pixelated field backdrop, darkened behind the text column so it stays readable */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+body::before {
+  background: url("./background.svg") center / cover no-repeat;
+  image-rendering: pixelated;
+}
+body::after {
+  background: linear-gradient(to right, rgba(2, 4, 12, 0.35), rgba(2, 4, 12, 0.82) 30%, rgba(2, 4, 12, 0.82) 70%, rgba(2, 4, 12, 0.35));
+}
+@media (max-width: 760px) {
+  body::after {
+    background: rgba(2, 4, 12, 0.7);
+  }
+}
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+header {
+  text-align: center;
+  margin: 32px 0 48px;
+}
+h1 {
+  margin: 0;
+  font-family: "Tangerine", "Quintessential", "Outfit", sans-serif;
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: black 0 0 5px;
+}
+.subtitle {
+  margin: 0.5rem 0 0;
+  font-family: "Quintessential", "Outfit", sans-serif;
+  opacity: 0.75;
+}
+h2 {
+  margin: 0 0 0.75rem;
+  font-family: "Quintessential", "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+}
+section {
+  margin-bottom: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+p, li, dd {
+  color: rgba(255,255,255,0.85);
+}
+em {
+  color: hsl(220, 55%, 80%);
+}
+.math {
+  font-family: "Quintessential", "Outfit", serif;
+  color: hsl(220, 55%, 80%);
+}
+.equation {
+  font-family: "Quintessential", "Outfit", serif;
+  font-size: 1.15rem;
+  text-align: center;
+  color: white;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  overflow-x: auto;
+}
+dt {
+  margin-top: 1rem;
+  font-family: "Tangerine", "Quintessential", "Outfit", sans-serif;
+  font-size: 2.2rem;
+  line-height: 1.1;
+}
+dd {
+  margin: 0;
+}
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-family: "Quintessential", "Outfit", sans-serif;
+  opacity: 0.9;
+}
+
+/* Same pill style as the ΔT readout of the application */
+.pill {
+  display: inline-flex;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 999px;
+  background: rgba(2, 4, 12, 0.55);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.28);
+  color: white;
+  font-family: "Quintessential", "Outfit", sans-serif;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: background 200ms, border-color 200ms;
+
+  &:hover, &:focus-visible {
+    background: rgba(2, 4, 12, 0.8);
+    border-color: rgba(255,255,255,0.6);
+  }
+}

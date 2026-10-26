@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Duality – About physics & art</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Quintessential&family=Tangerine:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <a href="../" class="pill">← Back to Duality</a>
+
+      <header>
+        <h1>Duality</h1>
+        <p class="subtitle">An interactive piece of art to play with particle-wave duality</p>
+      </header>
+
+      <section>
+        <h2>The idea</h2>
+        <p>
+          Is light a wave or a particle? Quantum physics answers: both, depending on how you look at it.
+          Duality takes this riddle as a playground. A field of waves and a swarm of particles share the
+          same canvas, and each one keeps shaping the other: particles throw energy into the field, and
+          the ripples they create steer the particles in return.
+        </p>
+        <p>
+          The piece borrows its inspiration from <em>walking droplets</em>: oil droplets bouncing on a vibrating
+          bath, guided by the very waves they emit. In 2005, Yves Couder and Emmanuel Fort showed that these
+          macroscopic objects reproduce some strikingly quantum-like behaviors, such as diffraction and
+          interference through slits.
+        </p>
+      </section>
+
+      <section>
+        <h2>The field</h2>
+        <p>
+          The background is a grid holding a scalar field <span class="math">c(x, y, t)</span>. It obeys a damped,
+          non-linear wave equation:
+        </p>
+        <p class="equation">τ ∂²c/∂t² = D Δc − ∂c/∂t − ν₁ c − ν₃ c³</p>
+        <ul>
+          <li><span class="math">D</span> sets how fast and far waves propagate (diffusion),</li>
+          <li><span class="math">τ</span> is the characteristic time of the field,</li>
+          <li><span class="math">ν₁</span> is a viscosity pulling the field back to rest,</li>
+          <li><span class="math">ν₃</span> damps large amplitudes and keeps the field from exploding.</li>
+        </ul>
+        <p>Walls are cells where the field is held at zero, which makes waves reflect and diffract.</p>
+      </section>
+
+      <section>
+        <h2>The particles</h2>
+        <p>
+          Each particle has a position <span class="math">r</span>, an orientation <span class="math">θ</span> and an internal
+          energy <span class="math">u</span>. They behave like active Brownian particles:
+        </p>
+        <p class="equation">dr/dt = v₀ e(θ) − µ ∇c + √(2D<sub>p</sub>) ξ</p>
+        <p class="equation">dθ/dt = ω (cos θ ∂<sub>y</sub>c − sin θ ∂<sub>x</sub>c) + √(2D<sub>r</sub>) ξ</p>
+        <p class="equation">du/dt = 1/τ<sub>u</sub> + λ |c|</p>
+        <ul>
+          <li><span class="math">v₀</span> is a self-propulsion speed along the orientation,</li>
+          <li><span class="math">µ</span> makes particles slide down the field gradient,</li>
+          <li><span class="math">ω</span> makes them turn according to the gradient,</li>
+          <li><span class="math">ξ</span> is random noise (Brownian motion, in position and rotation).</li>
+        </ul>
+        <p>
+          Energy builds up over time, and faster where the field is strong. Once it crosses a threshold,
+          the particle releases it into the field around it, creating a new ripple. This is the bounce
+          of the droplet: the particle writes the wave, the wave guides the particle.
+        </p>
+      </section>
+
+      <section>
+        <h2>The sound</h2>
+        <p>
+          The field is also an instrument. Depending on the mode, the grid is read as a raw audio signal,
+          analysed through its frequency spectrum, or voiced by the particles themselves. What you hear is
+          the same matter as what you see.
+        </p>
+      </section>
+
+      <section>
+        <h2>The modes</h2>
+        <dl>
+          <dt>The Playground</dt>
+          <dd>Two thousand particles and a field to stir with your pointer. Tune energy injection and diffusion.</dd>
+          <dt>The Tempest</dt>
+          <dd>Raindrops fall at random on the surface. Play with their intensity and frequency.</dd>
+          <dt>The Constellations</dt>
+          <dd>A dense swarm in which particles draw links to nearby partners, like stars in the night sky.</dd>
+          <dt>The Bouncing Droplets</dt>
+          <dd>A handful of self-propelled droplets, each surfing on its own wave and on the waves of the others.</dd>
+          <dt>The Interferences</dt>
+          <dd>A double-slit experiment: waves pass through two openings and interfere on the other side.</dd>
+          <dt>The Poem</dt>
+          <dd>Words are written into the field, letter by letter, and particles gather around their shapes.</dd>
+        </dl>
+      </section>
+
+      <section>
+        <h2>The art</h2>
+        <p>
+          Duality is not a scientific simulation in the strict sense. The equations are real, but the
+          parameters are chosen for what they show and what they sound like. It is an invitation to feel
+          with your hands and ears a duality that physics usually describes with abstract mathematics.
+        </p>
+        <p>Have fun interacting, and be careful with your precious ears: keep the sound low.</p>
+      </section>
+
+      <footer>
+        <p>Alex Andrix</p>
+        <a href="../" class="pill">← Back to Duality</a>
+      </footer>
+    </main>
+  </body>
+</html>
