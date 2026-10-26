@@ -349,3 +349,9 @@ section p a {
     color: white;
   }
 }
+.note {
+  padding: 0.6rem 1rem;
+  border-left: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.03);
+  font-size: 0.9rem;
+}
