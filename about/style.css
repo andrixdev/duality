@@ -340,3 +340,12 @@ blockquote {
     opacity: 0.7;
   }
 }
+
+/* Inline links in body text */
+section p a {
+  color: hsl(220, 55%, 80%);
+
+  &:hover, &:focus-visible {
+    color: white;
+  }
+}
