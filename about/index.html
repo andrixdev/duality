@@ -7,7 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Quintessential&family=Tangerine:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
     <link rel="stylesheet" href="./style.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body)"></script>
   </head>
   <body>
     <main>
@@ -32,6 +35,37 @@
           macroscopic objects reproduce some strikingly quantum-like behaviors, such as diffraction and
           interference through slits.
         </p>
+        <p>
+          Two other families of models from the physics of active matter join the droplets: <em>phoretic particles</em>,
+          which drift along the chemical field they release, and <em>elastoplastic models</em>, where stress slowly
+          builds up and is suddenly released once it crosses a threshold. A single set of equations covers all
+          three, and each mode of the piece tunes it towards one of them.
+        </p>
+
+        <details>
+          <summary>Technical details</summary>
+          <div class="details-body">
+            <p>The three families differ by how particles move, how they feed the field, and how the field responds:</p>
+            <dl class="families">
+              <dt>Walking droplets</dt>
+              <dd>
+                Active particles with a self-propulsion speed \(v_0\) along their orientation \(\vec e(\theta_i)\), which
+                rotates under the field gradient (\(\omega \neq 0\)). They inject small amounts of energy frequently.
+                The medium is inertial: the field oscillates and waves propagate (\(\tau_c\) large enough).
+              </dd>
+              <dt>Phoretic particles</dt>
+              <dd>
+                Particles move down the field gradient, \(\vec v_{ph} = -\mu \vec\nabla c\), and inject energy into
+                the field continuously. The field is overdamped: no oscillations, it only spreads out.
+              </dd>
+              <dt>Elastoplastic model</dt>
+              <dd>
+                Particles follow Brownian motion. Injection is rare, triggered by a threshold, and coupled to the
+                local value of the field. The field is overdamped too.
+              </dd>
+            </dl>
+          </div>
+        </details>
       </section>
 
       <section>
@@ -40,14 +74,55 @@
           The background is a grid holding a scalar field <span class="math">c(x, y, t)</span>. It obeys a damped,
           non-linear wave equation:
         </p>
-        <p class="equation">τ ∂²c/∂t² = D Δc − ∂c/∂t − ν₁ c − ν₃ c³</p>
+        <p class="equation">τ<sub>c</sub> ∂²c/∂t² + ∂c/∂t = D<sub>c</sub> Δc − ν₁ c − ν₃ c³</p>
         <ul>
-          <li><span class="math">D</span> sets how fast and far waves propagate (diffusion),</li>
-          <li><span class="math">τ</span> is the characteristic time of the field,</li>
+          <li><span class="math">D<sub>c</sub></span> sets how fast and far waves propagate (diffusion),</li>
+          <li><span class="math">τ<sub>c</sub></span> is the characteristic time of the field, its inertia,</li>
           <li><span class="math">ν₁</span> is a viscosity pulling the field back to rest,</li>
           <li><span class="math">ν₃</span> damps large amplitudes and keeps the field from exploding.</li>
         </ul>
-        <p>Walls are cells where the field is held at zero, which makes waves reflect and diffract.</p>
+        <p>
+          Walls are a second field, <span class="math">w(x, y)</span>, equal to 1 inside walls and 0 elsewhere. Waves cannot
+          cross them, so they reflect and diffract, and particles are pushed away from them.
+        </p>
+
+        <details>
+          <summary>Technical details</summary>
+          <div class="details-body">
+            <h3>Time integration</h3>
+            <p>
+              The second-order equation is split into two first-order updates, on the field \(c\) and on its
+              variation \(\dot c\), each with an optional numerical viscosity \(\eta\) (zero by default):
+            </p>
+            \[ \dot c(t+dt) = (1-\eta_v)\left(1-\frac{dt}{\tau_c}\right)\dot c(t) + \frac{D_c}{\tau_c}\,\Delta c\,dt - \frac{\nu_1}{\tau_c}\,c\,dt - \frac{\nu_3}{\tau_c}\,c^3\,dt \]
+            \[ c(t+dt) = (1-\eta_c\,dt)\,c(t) + \dot c(t+dt)\,dt \]
+            <p>
+              Values are then clamped to \([-1, 1]\) to protect against explosions. The grid is periodic: what
+              leaves on one side comes back on the other.
+            </p>
+            <p>
+              Physics runs at a fixed step of 12&nbsp;ms of machine time, \(dt' = dt \times 12\) with \(dt = 0.1\),
+              independently of the frame rate. A slow device runs several steps per frame (up to 8) to keep time
+              linear, and the scheme stays below its stability threshold on any device.
+            </p>
+
+            <h3>Discrete Laplacian</h3>
+            <p>On the grid, the Laplacian is estimated from a set of neighbouring cells \(\vec{dr}_k\):</p>
+            \[ \Delta c(\vec r) = \frac{2 \sum_k \left[c(\vec r + \vec{dr}_k) - c(\vec r)\right]}{\sum_k \|\vec{dr}_k\|^2}, \qquad \vec{dr}_k = r_0\,\vec{dr}_k^{\,cell} \]
+            <p>
+              where \(r_0\) is the cell-to-reality scale factor. The code supports three neighbourhoods: von Neumann 1
+              (4 adjacent cells), hollow von Neumann 2 and Moore 1 (the 8 surrounding cells, used for the field).
+            </p>
+
+            <h3>Coupling with walls</h3>
+            <p>Each term of the Laplacian is weighted by how free both cells are from walls:</p>
+            \[ \Delta c(\vec r) = \frac{2}{\sum_k \|\vec{dr}_k\|^2} \sum_k \left(1 - \tfrac12\left[w(\vec r + \vec{dr}_k) + w(\vec r)\right]\right)\left[c(\vec r + \vec{dr}_k) - c(\vec r)\right] \]
+            <p>
+              Between two free cells the usual Laplacian is recovered, and nothing flows into a wall. Inside walls,
+              the field is held at zero.
+            </p>
+          </div>
+        </details>
       </section>
 
       <section>
@@ -56,20 +131,62 @@
           Each particle has a position <span class="math">r</span>, an orientation <span class="math">θ</span> and an internal
           energy <span class="math">u</span>. They behave like active Brownian particles:
         </p>
-        <p class="equation">dr/dt = v₀ e(θ) − µ ∇c + √(2D<sub>p</sub>) ξ</p>
+        <p class="equation">dr/dt = v₀ e(θ) − µ ∇c − σ ∇w + √(2D<sub>p</sub>) ξ</p>
         <p class="equation">dθ/dt = ω (cos θ ∂<sub>y</sub>c − sin θ ∂<sub>x</sub>c) + √(2D<sub>r</sub>) ξ</p>
         <p class="equation">du/dt = 1/τ<sub>u</sub> + λ |c|</p>
         <ul>
           <li><span class="math">v₀</span> is a self-propulsion speed along the orientation,</li>
           <li><span class="math">µ</span> makes particles slide down the field gradient,</li>
+          <li><span class="math">σ</span> sets how strongly walls push particles away,</li>
           <li><span class="math">ω</span> makes them turn according to the gradient,</li>
           <li><span class="math">ξ</span> is random noise (Brownian motion, in position and rotation).</li>
         </ul>
         <p>
           Energy builds up over time, and faster where the field is strong. Once it crosses a threshold,
-          the particle releases it into the field around it, creating a new ripple. This is the bounce
-          of the droplet: the particle writes the wave, the wave guides the particle.
+          the particle releases all of it into the field around it, creating a new ripple, and starts charging
+          again. This is the bounce of the droplet: the particle writes the wave, the wave guides the particle.
         </p>
+
+        <details>
+          <summary>Technical details</summary>
+          <div class="details-body">
+            <h3>Update rules</h3>
+            <p>
+              Each particle \(i\) is advanced with an Euler–Maruyama scheme, where \(\partial_x c\) and \(\partial_y c\)
+              are the field gradient components at the particle's cell:
+            </p>
+            \[ \theta_i(t+dt) = \theta_i(t) + \omega\left(\cos\theta_i\,\partial_y c - \sin\theta_i\,\partial_x c\right)dt + \sqrt{2D_r\,dt}\;\xi_{\theta_i} \]
+            \[ \vec v_i(t) = v_0\,\vec e(\theta_i) - \mu\,\vec\nabla c - \sigma\,\vec\nabla w \]
+            \[ x_i(t+dt) = x_i(t) + v_{x_i}(t)\,dt + \sqrt{2D_p\,dt}\;\xi_{x_i} \]
+            \[ y_i(t+dt) = y_i(t) + v_{y_i}(t)\,dt + \sqrt{2D_p\,dt}\;\xi_{y_i} \]
+            \[ u_i(t+dt) = u_i(t) + \frac{dt}{\tau_u} + \lambda\,\left|c(x_i, y_i)\right|dt \]
+            <p>
+              The rotation term is the vertical component of \(\omega\,\vec e(\theta_i) \times \vec\nabla c\): particles
+              turn towards or away from the gradient depending on the sign of \(\omega\). The noises
+              \(\xi_{\theta_i}, \xi_{x_i}, \xi_{y_i}\) follow a normal distribution \(\mathcal N(0, 1)\), drawn with the
+              Box–Muller transform.
+            </p>
+
+            <h3>Energy release</h3>
+            <p>
+              When \(u_i(t+dt)\) exceeds the particle's threshold \(s_i\), the energy is injected into the field,
+              shared equally between the neighbouring cells, and \(u_i\) is reset to zero. A new threshold is then drawn:
+            </p>
+            \[ s_i = \alpha\,\left(-\ln U\right) + (1-\alpha), \qquad U \sim \mathcal U(0, 1] \]
+            <p>
+              The stochasticity \(\alpha \in [0, 1]\) moves the threshold from a fixed value of 1 (\(\alpha = 0\)) to an
+              exponentially distributed random value (\(\alpha = 1\)).
+            </p>
+
+            <h3>Walls</h3>
+            <p>Walls act on particles through a potential proportional to the wall field:</p>
+            \[ \phi(x, y) = \sigma\,w(x, y) \quad\Longrightarrow\quad \vec F = -\vec\nabla\phi = -\sigma\,\vec\nabla w \]
+            <p>
+              This force is added to the particle velocity. Particles that still end up inside a wall get their
+              self-propulsion boosted so they find their way out.
+            </p>
+          </div>
+        </details>
       </section>
 
       <section>
@@ -79,6 +196,30 @@
           analysed through its frequency spectrum, or voiced by the particles themselves. What you hear is
           the same matter as what you see.
         </p>
+
+        <details>
+          <summary>Technical details</summary>
+          <div class="details-body">
+            <p>Four sound layers are mixed differently in each mode:</p>
+            <dl class="families">
+              <dt>Raw grid</dt>
+              <dd>
+                The field values are played directly as a waveform. An audio worklet scans the grid cell after cell
+                at 44.1&nbsp;kHz, with about 17.6 samples per cell and linear interpolation between cells.
+              </dd>
+              <dt>Spectrum</dt>
+              <dd>
+                The whole grid is read as one signal and analysed with a 256-point FFT. A bank of 32 sine oscillators,
+                tuned to a C minor pentatonic scale across octaves, takes its loudness from the matching frequency bins.
+              </dd>
+              <dt>Field tone</dt>
+              <dd>A sine oscillator whose pitch rises with the maximum amplitude of the field, \(f = 20 + \sqrt{500\,\max|c|}\) Hz.</dd>
+              <dt>Particles</dt>
+              <dd>A square wave whose pitch follows the total speed of the particles.</dd>
+            </dl>
+            <p>Grid layers go through a 50&nbsp;Hz high-pass and a 3&nbsp;kHz low-pass filter.</p>
+          </div>
+        </details>
       </section>
 
       <section>
@@ -97,6 +238,58 @@
           <dt>The Poem</dt>
           <dd>Words are written into the field, letter by letter, and particles gather around their shapes.</dd>
         </dl>
+
+        <details>
+          <summary>Technical details</summary>
+          <div class="details-body">
+            <p>Each mode starts from the Playground parameters and changes a few of them:</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Mode</th><th>Changes from the Playground</th><th>Controls</th><th>Sound</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>The Playground</td>
+                    <td>2000 particles, \(D_c = 30\), \(\tau_c = 100\), \(\nu_1 = \nu_3 = 5\), \(\mu = 10\), \(\omega = -10\), \(D_r = 0.1\)</td>
+                    <td>Energy injection, diffusion</td>
+                    <td>Particles, field tone, spectrum</td>
+                  </tr>
+                  <tr>
+                    <td>The Tempest</td>
+                    <td>Random raindrops injected on the grid</td>
+                    <td>Rain intensity, rain quantity</td>
+                    <td>Particles, raw grid</td>
+                  </tr>
+                  <tr>
+                    <td>The Constellations</td>
+                    <td>3000 particles, \(D_c = 90\), \(\nu_1 = 10\), links between partners</td>
+                    <td>Energy injection, viscosity</td>
+                    <td>Field tone, raw grid</td>
+                  </tr>
+                  <tr>
+                    <td>The Bouncing Droplets</td>
+                    <td>6 particles, \(v_0 = 2\), \(\mu = 50\), no Brownian noise, gentle pointer</td>
+                    <td>Energy injection, gradient coupling</td>
+                    <td>Spectrum</td>
+                  </tr>
+                  <tr>
+                    <td>The Interferences</td>
+                    <td>Caged grid with a double slit, 20 particles, \(\mu = 0\), \(D_c = 800\), strong injection</td>
+                    <td>Diffusion, energy injection</td>
+                    <td>Spectrum</td>
+                  </tr>
+                  <tr>
+                    <td>The Poem</td>
+                    <td>Pixel letters injected into the field, no pointer injection, \(D_c = 3\), \(\mu = 500\), \(v_0 = 20\)</td>
+                    <td>Word quantity, diffusion</td>
+                    <td>Spectrum</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
       </section>
 
       <section>
