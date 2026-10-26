@@ -37,7 +37,7 @@ const baseParams = {
   activateEnergyRelease: true,
   particlesEnergyInjection: 80, // Inject only a portion to grid
   energyThresholdStochasticity: 0, // α [0, 1]
-  neighborMode: "vn2", // "vn1", "vn2h", "moo1"
+  neighborMode: "moo1", // "vn1", "vn2h", "moo1"
   minGridValue: -1, // Clamp grid values (explosion protect)
   maxGridValue: 1, // Clamp grid values (explosion protect)
   wallPotentialScale: 1, // σ - Particles sensitivity to walls
