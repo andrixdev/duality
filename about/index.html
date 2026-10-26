@@ -106,6 +106,19 @@
               linear, and the scheme stays below its stability threshold on any device.
             </p>
 
+            <h3>Waves or spreading</h3>
+            <p>
+              Whether the field oscillates or only spreads out depends on its inertia \(\tau_c\). Neglecting the
+              viscosities, a mode of wavenumber \(q\), \(c \propto e^{i\vec q \cdot \vec r + st}\), satisfies
+              \(\tau_c s^2 + s + D_c q^2 = 0\). It oscillates, and waves propagate, when the roots are complex:
+            </p>
+            \[ \tau_c > \frac{1}{4\,q^2 D_c} \]
+            <p>
+              Here \(D_c q^2\) is the rate at which that mode would relax by pure diffusion. Above this threshold the
+              medium is inertial, like the bath of the walking droplets. Below it, the field is overdamped, as in the
+              phoretic and elastoplastic models.
+            </p>
+
             <h3>Discrete Laplacian</h3>
             <p>On the grid, the Laplacian is estimated from a set of neighbouring cells \(\vec{dr}_k\):</p>
             \[ \Delta c(\vec r) = \frac{2 \sum_k \left[c(\vec r + \vec{dr}_k) - c(\vec r)\right]}{\sum_k \|\vec{dr}_k\|^2}, \qquad \vec{dr}_k = r_0\,\vec{dr}_k^{\,cell} \]
