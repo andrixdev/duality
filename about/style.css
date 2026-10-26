@@ -293,3 +293,50 @@ details.notes {
   }
 }
 
+/* The art: epigraph, questions and quote */
+blockquote {
+  margin: 1.5rem 0;
+  font-family: "Quintessential", "Outfit", serif;
+
+  p {
+    color: white;
+  }
+}
+.epigraph {
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+  .translation {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    color: hsl(220, 55%, 80%);
+  }
+}
+.questions {
+  padding-left: 1rem;
+  border-left: 2px solid hsl(220, 55%, 80%);
+  font-family: "Quintessential", "Outfit", serif;
+  color: white;
+}
+.quote {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  cite {
+    display: block;
+    margin-top: 0.4rem;
+    font-style: normal;
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+}
