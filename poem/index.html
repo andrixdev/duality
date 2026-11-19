@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-title-en="Duality – The Poem" data-title-fr="Duality – Le Poème">Duality – The Poem</title>
+    <script src="../lang.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Quintessential&family=Tangerine:wght@400;700&display=swap" rel="stylesheet" />
+    <!-- Shares the about page's look (pills, fonts, language switch), with its own background and poem layout -->
+    <link rel="stylesheet" href="../about/style.css" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!--
+      Bilingual page: every text element comes as an EN/FR pair marked class="i18n" lang="..".
+      The poem itself is the French original, shown in both languages.
+      Its source text is "Eric duality poem.txt", from which The Poem mode samples its words.
+    -->
+    <main>
+      <nav class="topbar">
+        <a href="../" class="pill">
+          <span class="i18n" lang="en">← Back to Duality</span>
+          <span class="i18n" lang="fr">← Retour à Duality</span>
+        </a>
+        <button type="button" class="pill lang-toggle" aria-label="Passer en français">
+          <span class="lang-opt" data-lang="fr">FR</span><span class="lang-sep">/</span><span class="lang-opt" data-lang="en">EN</span>
+        </button>
+      </nav>
+
+      <header>
+        <h1 class="i18n" lang="en">The Poem</h1>
+        <h1 class="i18n" lang="fr">Le Poème</h1>
+        <p class="subtitle i18n" lang="en">A poem by Eric Bertin, written in French. Its words drift through The Poem mode of Duality.</p>
+        <p class="subtitle i18n" lang="fr">Un poème d’Eric Bertin. Ses mots flottent dans le mode Le Poème de Duality.</p>
+      </header>
+
+      <article class="poem" lang="fr">
+        <p class="verses">
+          <span>«&nbsp;J’ai rêvé d’être une onde&nbsp;», s’écrie la particule</span>
+          <span>Emerveillée de voir qu’en elle une part ondule.</span>
+          <span>Encore un rêve quantique, se dit-elle incrédule&nbsp;!</span>
+          <span>Pourtant je suis classique, un simple corpuscule.</span>
+          <span>L’onde est autour de moi, où que je déambule,</span>
+          <span>Elle m’entraine et me guide, inconscient somnambule.</span>
+          <span>Sur le champ elle se lance et entame une danse</span>
+          <span>Ballottée par les flots, elle virevolte en tout sens</span>
+          <span>Mais quel est donc ce champ qui enivre ses sens&nbsp;?</span>
+          <span>Oui elle crée la musique sur laquelle elle s’ambiance&nbsp;!</span>
+          <span>Car c’est son propre chant, aux autres entremélé</span>
+          <span>Qui revient en écho, faire une danse endiablée.</span>
+        </p>
+        <p class="poem-author">Eric Bertin</p>
+      </article>
+
+      <footer>
+        <a href="../about/" class="pill">
+          <span class="i18n" lang="en">About physics &amp; art</span>
+          <span class="i18n" lang="fr">Physique &amp; art</span>
+        </a>
+        <a href="../" class="pill">
+          <span class="i18n" lang="en">← Back to Duality</span>
+          <span class="i18n" lang="fr">← Retour à Duality</span>
+        </a>
+      </footer>
+    </main>
+  </body>
+</html>

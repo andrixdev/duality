@@ -98,7 +98,7 @@ let updateModeParams = () => {
     params.particlesSelfPropulsionSpeed = 20
 
     // Audio
-    params.audioEnableParticles = false
+    params.audioEnableParticles = true
     params.audioEnableBasicGrid = false
     params.audioEnableRawGrid = false
     params.audioEnableFft = true
@@ -133,10 +133,10 @@ let updateModeParams = () => {
     params.particlesRotDiffusion = 0
     params.particlesSelfPropulsionSpeed = 2
     params.particlesGradCoupling = 50
-    params.injectionAmplitude = 0.02 * baseParams.injectionAmplitude
+    //params.injectionAmplitude = 0.02 * baseParams.injectionAmplitude
     
     // Audio
-    params.audioEnableParticles = false
+    params.audioEnableParticles = true
     params.audioEnableBasicGrid = false
     params.audioEnableRawGrid = false
     params.audioEnableFft = true

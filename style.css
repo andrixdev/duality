@@ -161,9 +161,30 @@ html[lang="fr"] .i18n:not([lang="fr"]) {
   font-weight: 600;
 }
 
-.about-link {
+/* Links to the poem and about pages, side by side at the top centre of the guide */
+.guide-links {
+  position: fixed;
   top: 18px;
-  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  /* Keep clear of the FR/EN switch on the right */
+  .guide-links {
+    left: 18px;
+    right: 120px;
+    transform: none;
+    flex-wrap: wrap;
+  }
+}
+
+.about-link {
+  position: static;
+  transform: none;
+  white-space: nowrap;
   font-size: 1rem;
   text-decoration: none;
   pointer-events: auto;

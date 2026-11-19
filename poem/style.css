@@ -1,0 +1,56 @@
+/* Poem page: builds on ../about/style.css, with a navy backdrop inspired by The Tempest mode */
+html {
+  background: #01040b;
+}
+body::before {
+  background-image: url("./background.svg");
+}
+body::after {
+  background: radial-gradient(ellipse 60% 75% at 50% 50%, rgba(1, 4, 11, 0.85), rgba(1, 4, 11, 0.55) 65%, rgba(1, 4, 11, 0.1));
+}
+@media (max-width: 760px) {
+  body::after {
+    background: rgba(1, 4, 11, 0.72);
+  }
+}
+
+main {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  margin-bottom: 40px;
+}
+footer {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.poem {
+  margin: 0 auto 56px;
+  font-family: "Quintessential", "Outfit", serif;
+  font-size: clamp(1.05rem, 3.6vw, 1.4rem);
+  line-height: 1.4;
+  text-align: center;
+  text-shadow: black 0 0 6px;
+
+  p {
+    margin: 0;
+    color: white;
+  }
+  /* One block per verse, so a verse that wraps on a narrow screen still reads as one line */
+  .verses span {
+    display: block;
+    margin-bottom: 0.5em;
+  }
+}
+.poem-author {
+  margin-top: 1.5rem !important;
+  font-family: "Tangerine", "Quintessential", "Outfit", sans-serif;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: hsl(205, 75%, 78%) !important;
+}

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid slice">
+  <!-- Inspired by The Tempest mode: a mottled navy field at cell scale, scattered pale cells, white particles drifting on top -->
+  <defs>
+    <filter id="field" x="0" y="0" width="1200" height="1200" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <!-- Field intensity: mostly cell-scale noise (raindrop ripples) over faint low-frequency blobs -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.004" numOctaves="3" seed="21" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" result="blobs" />
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="5" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" result="speckles" />
+      <feComposite in="blobs" in2="speckles" operator="arithmetic" k2="0.6" k3="0.75" k4="-0.42" result="noise" />
+      <feColorMatrix in="noise" type="matrix" values="
+        2.2 0 0 0 -0.3
+        2.2 0 0 0 -0.3
+        2.2 0 0 0 -0.3
+        0   0 0 0 1" result="intensity" />
+
+      <!-- Ocean colour map: near-black navy, deep blue, steel blue, bright azure -->
+      <feComponentTransfer in="intensity" result="colored">
+        <feFuncR type="table" tableValues="0.004 0.008 0.016 0.03 0.05 0.09 0.15" />
+        <feFuncG type="table" tableValues="0.012 0.03 0.07 0.13 0.22 0.36 0.52" />
+        <feFuncB type="table" tableValues="0.03 0.07 0.14 0.25 0.4 0.6 0.84" />
+      </feComponentTransfer>
+
+      <!-- Raindrops: rare peaks of cell-scale noise become pale ice-blue cells -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="1" seed="13" />
+      <feColorMatrix type="matrix" values="
+        0 0 0 0 0.8
+        0 0 0 0 0.92
+        0 0 0 0 0.98
+        140 0 0 0 -103.5" result="drops" />
+      <feMerge result="field">
+        <feMergeNode in="colored" />
+        <feMergeNode in="drops" />
+      </feMerge>
+
+      <!-- Pixelate into 16px cells: sample one point per cell, then dilate it to fill the cell -->
+      <feFlood x="7" y="7" width="2" height="2" flood-color="#fff" />
+      <feComposite width="16" height="16" />
+      <feTile result="samples" />
+      <feComposite in="field" in2="samples" operator="in" />
+      <feMorphology operator="dilate" radius="8" result="pixels" />
+
+      <!-- Particles: rare peaks of fine noise become white specks -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="1" seed="9" result="fine" />
+      <feColorMatrix in="fine" type="matrix" values="
+        0 0 0 0 0.85
+        0 0 0 0 0.9
+        0 0 0 0 0.96
+        70 0 0 0 -52.5" result="particles" />
+
+      <feMerge>
+        <feMergeNode in="pixels" />
+        <feMergeNode in="particles" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="1200" fill="#01040b" filter="url(#field)" />
+</svg>
