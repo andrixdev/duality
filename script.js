@@ -14,13 +14,13 @@ let cycleMode = (step) => {
 
 // Common base for exposed parameters
 const baseParams = {
-  gridDimension: 100, // dim - Ready for some CPU sweat?
+  gridDimension: 120, // dim - Ready for some CPU sweat?
   responsive: true,
   population: 2000, // pop - Particles population
   fieldDiffusion: 30, // Dp - Amplitude of diffusion
   fieldDiffusionTau: 100, // τp - Typical time of diffusion
-  viscosity1: 5, // ν1 - Physical viscosity
-  viscosity3: 5, // ν3 - Physical viscosity for cube of field
+  viscosity1: 5, // ν1 - Linear damping coefficient
+  viscosity3: 5, // ν3 - Cubic damping coefficient
   numericalIntensityViscosity: 0, // η_i Numerical relaxation 1
   numericalVariationViscosity: 0, // η_v Numerical relaxation 2
   injectionAmplitude: 1, // Mouse/rain injection
@@ -300,6 +300,49 @@ const pixelFontLower = {
   x: [...pixelFontPad, "10001", "01010", "00100", "01010", "10001"],
   y: [...pixelFontPad, "10001", "10001", "10001", "01111", "00001", "00001", "01110"],
   z: [...pixelFontPad, "11111", "00010", "00100", "01000", "11111"]
+}
+
+// Poem source: mode "poem" writes random words and, sometimes, short phrases taken from this text
+const poemSourceUrl = "./poem/" + encodeURIComponent("Eric duality poem.txt")
+const poemMinWordLength = 4 // Shorter words (le, de, une, est...) are skipped when picking single words
+const poemStopWords = new Set(["elle", "mais", "donc", "quel", "dans", "pour", "avec", "sont", "cette", "suis", "tout", "faire", "laquelle", "autres"])
+const poemPhraseChance = 0.25 // Probability that a spawn writes a 2-3 word phrase instead of a single word
+const poemMaxPhraseLetters = 18 // Longer phrases are rejected so they stay readable on the grid
+let poemLines = [] // Each line of the poem as an array of tokens (accents stripped, elisions like "d'etre" kept whole)
+let poemWords = [] // Meaningful single words to pick from
+let poemWordSet = new Set()
+// Lowercase, strip accents and keep only a-z letters plus apostrophes (the pixel font only has a-z)
+let tokenizePoemLine = line => line.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+  .replace(/œ/g, "oe").replace(/æ/g, "ae").replace(/’/g, "'")
+  .split(/[^a-z']+/).map(t => t.replace(/^'+|'+$/g, "")).filter(t => t.length > 0)
+fetch(poemSourceUrl)
+  .then(response => response.ok ? response.text() : Promise.reject(response.status))
+  .then(text => {
+    poemLines = text.split(/\r?\n/).map(tokenizePoemLine).filter(tokens => tokens.length > 0)
+    // For single words, an elision keeps only its main word ("d'etre" -> "etre")
+    poemWords = poemLines.flat().map(t => t.split("'").pop())
+      .filter(w => w.length >= poemMinWordLength && !poemStopWords.has(w))
+    poemWordSet = new Set(poemWords)
+  })
+  .catch(err => console.warn("Poem source not loaded, using random letters instead:", err))
+// Returns the words to write: a single word, or sometimes a short phrase; null if the poem is not loaded
+let pickPoemWords = () => {
+  if (poemWords.length == 0) return null
+  if (Math.random() < poemPhraseChance) {
+    for (let attempt = 0; attempt < 10; attempt++) {
+      let line = poemLines[Math.floor(Math.random() * poemLines.length)]
+      let n = 2 + Math.floor(Math.random() * 2)
+      if (line.length < n) continue
+      let start = Math.floor(Math.random() * (line.length - n + 1))
+      let phrase = line.slice(start, start + n)
+      // Skip phrases with elisions (no apostrophe glyph), without any meaningful word, or too long
+      if (phrase.some(t => t.includes("'"))) continue
+      if (!phrase.some(t => poemWordSet.has(t))) continue
+      if (phrase.join("").length > poemMaxPhraseLetters) continue
+      return phrase
+    }
+  }
+  return [poemWords[Math.floor(Math.random() * poemWords.length)]]
 }
 let lastFrameTime = null
 let cellSize, simW, simH
@@ -736,7 +779,7 @@ class System {
         let dtt = physicsStepMs * dt
         
         // First order
-        newValue += (1 - vVisc) * (1 - dtt / tau) * variation
+        newValue += (1 - vVisc * dtt) * (1 - dtt / tau) * variation
         
         // Laplacian
         if (w == 1) intensityLaplacian = 0
@@ -1044,6 +1087,31 @@ class Particle {
     }
   }
 }
+// Simulation UI texts, [English, French]. The language is set by lang.js (FR/EN toggle on the guide overlay).
+const uiTexts = {
+  modeNames: {
+    base: ["The Playground", "Le Terrain de Jeu"],
+    poem: ["The Poem", "Le Poème"],
+    rain: ["The Tempest", "La Tempête"],
+    constellations: ["The Constellations", "Les Constellations"],
+    bouncing: ["The Bouncing Droplets", "Les Gouttes Marcheuses"],
+    slits: ["The Interferences", "Les Interférences"]
+  },
+  energyInjection: ["Energy injection", "Injection d’énergie"],
+  energyInjectionRight: ["Energy injection<br/>(right side)", "Injection d’énergie<br/>(côté droit)"],
+  fieldDiffusion: ["Field diffusion", "Diffusion du champ"],
+  wordFlow: ["Word flow", "Flux de mots"],
+  rainIntensity: ["Rain intensity", "Intensité de la pluie"],
+  rainQuantity: ["Rain quantity", "Quantité de pluie"],
+  damping: ["Damping", "Amortissement"],
+  gradientCoupling: ["Gradient coupling", "Couplage au gradient"],
+  insufficientPerformance: [
+    "Sorry, the computing capabilities of this machine are insufficient to run this simulation smoothly. The simulation has been stopped.",
+    "Désolé, les capacités de calcul de cette machine sont insuffisantes pour faire tourner cette simulation de façon fluide. La simulation a été arrêtée."
+  ]
+}
+let tr = pair => pair[document.documentElement.lang === "fr" ? 1 : 0]
+
 class UI {
   constructor (gamepad) {
     this.panelIndex = 0
@@ -1061,6 +1129,7 @@ class UI {
     this.gamepad = gamepad
     this.updatePanelsMode(baseParams.modeName, baseParams.fullModeName)
     this.updateDeltaTms()
+    document.addEventListener("duality:langchange", () => this.updatePanelsMode(params.modeName, params.fullModeName))
     this.initInteractions()
   }
   bootAudio () {
@@ -1198,40 +1267,41 @@ class UI {
     this.deltaTmsValue.textContent = `${deltaTms.toFixed(1)} ms`
   }
   updatePanelsMode(modeName, fullModeName) {
-    if (this.modeNameValue) this.modeNameValue.textContent = fullModeName
+    let modeNamePair = uiTexts.modeNames[modeName]
+    if (this.modeNameValue) this.modeNameValue.textContent = modeNamePair ? tr(modeNamePair) : fullModeName
     if (modeName == "base") {
-      this.panel0name.innerHTML = "Energy injection"
-      this.panel1name.innerHTML = "Field diffusion"
+      this.panel0name.innerHTML = tr(uiTexts.energyInjection)
+      this.panel1name.innerHTML = tr(uiTexts.fieldDiffusion)
       this.panel0value.innerHTML = params.particlesEnergyInjection
       this.panel1value.innerHTML = params.fieldDiffusion
     }
     else if (modeName == "poem") {
-      this.panel0name.innerHTML = "Word flow"
-      this.panel1name.innerHTML = "Field diffusion"
+      this.panel0name.innerHTML = tr(uiTexts.wordFlow)
+      this.panel1name.innerHTML = tr(uiTexts.fieldDiffusion)
       this.panel0value.innerHTML = params.wordsPerStep
       this.panel1value.innerHTML = params.fieldDiffusion
     }
     else if (modeName == "rain") {
-      this.panel0name.innerHTML = "Rain intensity"
-      this.panel1name.innerHTML = "Rain quantity"
+      this.panel0name.innerHTML = tr(uiTexts.rainIntensity)
+      this.panel1name.innerHTML = tr(uiTexts.rainQuantity)
       this.panel0value.innerHTML = params.injectionAmplitude
       this.panel1value.innerHTML = params.raindropsPerStep
     }
     else if (modeName == "constellations") {
-      this.panel0name.innerHTML = "Energy injection"
-      this.panel1name.innerHTML = "Viscosity"
+      this.panel0name.innerHTML = tr(uiTexts.energyInjection)
+      this.panel1name.innerHTML = tr(uiTexts.damping)
       this.panel0value.innerHTML = params.particlesEnergyInjection
       this.panel1value.innerHTML = params.viscosity1
     }
     else if (modeName == "bouncing") {
-      this.panel0name.innerHTML = "Energy injection"
-      this.panel1name.innerHTML = "Gradient coupling"
+      this.panel0name.innerHTML = tr(uiTexts.energyInjection)
+      this.panel1name.innerHTML = tr(uiTexts.gradientCoupling)
       this.panel0value.innerHTML = params.particlesEnergyInjection
       this.panel1value.innerHTML = params.particlesGradCoupling
     }
     else if (modeName == "slits") {
-      this.panel0name.innerHTML = "Field diffusion"
-      this.panel1name.innerHTML = "Energy injection<br/>(right side)"
+      this.panel0name.innerHTML = tr(uiTexts.fieldDiffusion)
+      this.panel1name.innerHTML = tr(uiTexts.energyInjectionRight)
       this.panel0value.innerHTML = params.fieldDiffusion
       this.panel1value.innerHTML = params.particlesEnergyInjection
     }
@@ -2025,17 +2095,24 @@ let stepPhysics = () => {
   for (let s = 0; s < words; s++) {
     let cx0 = Math.floor(Math.random() * dimX)
     let cy0 = Math.floor(Math.random() * dimY)
-    // Random word of 3 to 10 random letters, only the first one in uppercase
-    let wordLength = 3 + Math.floor(Math.random() * 8)
-    for (let k = 0; k < wordLength; k++) {
-      let letter = pixelFontLetters[Math.floor(Math.random() * pixelFontLetters.length)]
-      activeGlyphs.push({
-        cx0: cx0 + k * (glyphWidth + 1),
-        cy0: cy0,
-        rows: (k == 0 ? pixelFont : pixelFontLower)[letter],
-        stepsLeft: glyphLifetimeSteps
-      })
+    // A word or short phrase from the poem (fallback: 3 to 10 random letters), only the first letter in uppercase
+    let text = pickPoemWords()
+    if (!text) {
+      let wordLength = 3 + Math.floor(Math.random() * 8)
+      text = [Array.from({ length: wordLength }, () => pixelFontLetters[Math.floor(Math.random() * pixelFontLetters.length)]).join("")]
     }
+    let k = 0 // Glyph slot along the line (a space between words takes one slot)
+    text.join(" ").split("").forEach((letter, index) => {
+      if (pixelFont[letter]) {
+        activeGlyphs.push({
+          cx0: cx0 + k * (glyphWidth + 1),
+          cy0: cy0,
+          rows: (index == 0 ? pixelFont : pixelFontLower)[letter],
+          stepsLeft: glyphLifetimeSteps
+        })
+      }
+      k++
+    })
   }
   activeGlyphs = activeGlyphs.filter(g => {
     iGrid.addGlyph(g.cx0, g.cy0, g.rows, params.injectionAmplitude / 700)
@@ -2057,7 +2134,7 @@ let haltForInsufficientPerformance = () => {
   if (audio && audio.audioCtx) audio.audioCtx.close().catch(() => {})
   audio = null
   let popup = document.createElement("div")
-  popup.textContent = "Sorry, the computing capabilities of this machine are insufficient to run this simulation smoothly. The simulation has been stopped."
+  popup.textContent = tr(uiTexts.insufficientPerformance)
   popup.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);box-sizing:border-box;width:min(90vw,480px);padding:clamp(14px,4vw,24px) clamp(16px,5vw,32px);background:rgba(20,20,20,0.92);color:#eee;border-radius:6px;font-family:'Quintessential','Outfit',sans-serif;font-size:clamp(14px,4vw,18px);line-height:1.6;text-align:center;z-index:1000;box-shadow:0 4px 24px rgba(0,0,0,0.5)"
   document.body.appendChild(popup)
 }

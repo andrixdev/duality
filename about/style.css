@@ -103,9 +103,25 @@ footer {
   opacity: 0.9;
 }
 
+/* FR/EN switch: elements tagged .i18n only show in the current language */
+html[lang="en"] .i18n:not([lang="en"]),
+html[lang="fr"] .i18n:not([lang="fr"]) {
+  display: none !important;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
 /* Same pill style as the ΔT readout of the application */
 .pill {
   display: inline-flex;
+  gap: 0.35rem;
+  font-size: 1rem;
+  cursor: pointer;
   padding: 0.5rem 0.8rem;
   border: 1px solid rgba(255,255,255,0.25);
   border-radius: 999px;
@@ -121,6 +137,16 @@ footer {
     background: rgba(2, 4, 12, 0.8);
     border-color: rgba(255,255,255,0.6);
   }
+}
+
+.lang-toggle {
+  .lang-opt, .lang-sep {
+    opacity: 0.45;
+  }
+}
+html[lang="en"] .lang-opt[data-lang="en"],
+html[lang="fr"] .lang-opt[data-lang="fr"] {
+  opacity: 1;
 }
 
 /* Foldable technical details */
@@ -338,6 +364,58 @@ blockquote {
     font-style: normal;
     font-size: 0.9rem;
     opacity: 0.7;
+  }
+}
+
+/* Minimal grid diagram (energy release into the Moore neighbourhood) */
+.diagram {
+  margin: 1.25rem 0;
+  text-align: center;
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+  .cell {
+    fill: rgba(2, 4, 12, 0.7);
+    stroke: rgba(255,255,255,0.22);
+    stroke-width: 1;
+  }
+  .cell.far {
+    stroke: rgba(255,255,255,0.1);
+  }
+  .cell.neigh {
+    fill: hsla(220, 55%, 80%, 0.32);
+    stroke: hsl(220, 55%, 80%);
+    stroke-width: 1.5;
+  }
+  .particle {
+    fill: white;
+  }
+  .leader {
+    fill: none;
+    stroke: rgba(255,255,255,0.6);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .leader-dot {
+    fill: rgba(255,255,255,0.8);
+  }
+  text.annot {
+    font-size: 14px;
+    text-anchor: start;
+    fill: hsl(220, 55%, 80%);
+  }
+  text {
+    font-family: "Quintessential", "Outfit", serif;
+    font-size: 12px;
+    fill: white;
+    text-anchor: middle;
+  }
+  figcaption {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.65);
   }
 }
 

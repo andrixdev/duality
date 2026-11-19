@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Duality – About physics & art</title>
+    <title data-title-en="Duality – About physics & art" data-title-fr="Duality – Physique et art">Duality – About physics & art</title>
+    <script src="../lang.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Quintessential&family=Tangerine:wght@400;700&display=swap" rel="stylesheet" />
@@ -13,55 +14,106 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body)"></script>
   </head>
   <body>
+    <!--
+      Bilingual page: every text element comes as an EN/FR pair marked class="i18n" lang="..".
+      Only the pair matching the current language is shown (see lang.js and style.css).
+    -->
     <main>
-      <a href="../" class="pill">← Back to Duality</a>
+      <nav class="topbar">
+        <a href="../" class="pill">
+          <span class="i18n" lang="en">← Back to Duality</span>
+          <span class="i18n" lang="fr">← Retour à Duality</span>
+        </a>
+        <button type="button" class="pill lang-toggle" aria-label="Passer en français">
+          <span class="lang-opt" data-lang="fr">FR</span><span class="lang-sep">/</span><span class="lang-opt" data-lang="en">EN</span>
+        </button>
+      </nav>
 
       <header>
         <h1>Duality</h1>
-        <p class="subtitle">An interactive piece of art to play with particle-wave duality</p>
+        <p class="subtitle i18n" lang="en">An interactive piece of art to play with particle-wave duality</p>
+        <p class="subtitle i18n" lang="fr">Une œuvre d’art interactive pour jouer avec la dualité onde-particule</p>
       </header>
 
       <section>
-        <h2>The idea</h2>
-        <p>
+        <h2 class="i18n" lang="en">The idea</h2>
+        <h2 class="i18n" lang="fr">L’idée</h2>
+        <p class="i18n" lang="en">
           Is light a wave or a particle? Quantum physics answers: both, depending on how you look at it.
           Duality takes this riddle as a playground. A field of waves and a swarm of particles share the
           same canvas, and each one keeps shaping the other: particles throw energy into the field, and
           the ripples they create steer the particles in return.
         </p>
-        <p>
+        <p class="i18n" lang="fr">
+          La lumière est-elle une onde ou une particule&nbsp;? La physique quantique répond&nbsp;: les deux, selon
+          la manière dont on la regarde. Duality fait de cette énigme un terrain de jeu. Un champ d’ondes et un
+          essaim de particules partagent la même toile, et chacun ne cesse de façonner l’autre&nbsp;: les particules
+          injectent de l’énergie dans le champ, et les ondulations qu’elles créent les guident en retour.
+        </p>
+        <p class="i18n" lang="en">
           The piece borrows its inspiration from <em>walking droplets</em>: oil droplets bouncing on a vibrating
           bath, guided by the very waves they emit. In 2005, Yves Couder and Emmanuel Fort showed that these
           macroscopic objects reproduce some strikingly quantum-like behaviors, such as diffraction and
           interference through slits.
         </p>
-        <p>
+        <p class="i18n" lang="fr">
+          L’œuvre puise son inspiration dans les <em>gouttes marcheuses</em>&nbsp;: des gouttes d’huile qui rebondissent
+          sur un bain vibrant, guidées par les ondes mêmes qu’elles émettent. En 2005, Yves Couder et Emmanuel Fort
+          ont montré que ces objets macroscopiques reproduisent des comportements étonnamment quantiques, comme la
+          diffraction et les interférences à travers des fentes.
+        </p>
+        <p class="i18n" lang="en">
           Two other families of models from the physics of active matter join the droplets: <em>phoretic particles</em>,
           which drift along the chemical field they release, and <em>elastoplastic models</em>, where stress slowly
           builds up and is suddenly released once it crosses a threshold. A single set of equations covers all
           three, and each mode of the piece tunes it towards one of them.
         </p>
+        <p class="i18n" lang="fr">
+          Deux autres familles de modèles issus de la physique de la matière active rejoignent les gouttes&nbsp;: les
+          <em>particules phorétiques</em>, qui dérivent le long du champ chimique qu’elles libèrent, et les
+          <em>modèles élastoplastiques</em>, où une contrainte s’accumule lentement puis se relâche brusquement dès
+          qu’elle franchit un seuil. Un même jeu d’équations couvre les trois, et chaque mode de l’œuvre l’oriente
+          vers l’un d’eux.
+        </p>
 
         <details>
-          <summary>Technical details</summary>
+          <summary><span class="i18n" lang="en">Technical details</span><span class="i18n" lang="fr">Détails techniques</span></summary>
           <div class="details-body">
-            <p>The three families differ by how particles move, how they feed the field, and how the field responds:</p>
+            <p class="i18n" lang="en">The three families differ by how particles move, how they feed the field, and how the field responds:</p>
+            <p class="i18n" lang="fr">Les trois familles diffèrent par la façon dont les particules se déplacent, dont elles alimentent le champ, et dont le champ répond&nbsp;:</p>
             <dl class="families">
-              <dt>Walking droplets</dt>
-              <dd>
+              <dt class="i18n" lang="en">Walking droplets</dt>
+              <dt class="i18n" lang="fr">Gouttes marcheuses</dt>
+              <dd class="i18n" lang="en">
                 Active particles with a self-propulsion speed \(v_0\) along their orientation \(\vec e(\theta_i)\), which
                 rotates under the field gradient (\(\omega \neq 0\)). They inject small amounts of energy frequently.
                 The medium is inertial: the field oscillates and waves propagate (\(\tau_c\) large enough).
               </dd>
-              <dt>Phoretic particles</dt>
-              <dd>
+              <dd class="i18n" lang="fr">
+                Des particules actives, avec une vitesse d’autopropulsion \(v_0\) selon leur orientation \(\vec e(\theta_i)\),
+                qui tourne sous l’effet du gradient du champ (\(\omega \neq 0\)). Elles injectent fréquemment de petites
+                quantités d’énergie. Le milieu est inertiel&nbsp;: le champ oscille et des ondes se propagent (\(\tau_c\)
+                assez grand).
+              </dd>
+              <dt class="i18n" lang="en">Phoretic particles</dt>
+              <dt class="i18n" lang="fr">Particules phorétiques</dt>
+              <dd class="i18n" lang="en">
                 Particles move down the field gradient, \(\vec v_{ph} = -\mu \vec\nabla c\), and inject energy into
                 the field continuously. The field is overdamped: no oscillations, it only spreads out.
               </dd>
-              <dt>Elastoplastic model</dt>
-              <dd>
+              <dd class="i18n" lang="fr">
+                Les particules descendent le gradient du champ, \(\vec v_{ph} = -\mu \vec\nabla c\), et injectent de
+                l’énergie dans le champ en continu. Le champ est suramorti&nbsp;: pas d’oscillations, il ne fait que s’étaler.
+              </dd>
+              <dt class="i18n" lang="en">Elastoplastic model</dt>
+              <dt class="i18n" lang="fr">Modèle élastoplastique</dt>
+              <dd class="i18n" lang="en">
                 Particles follow Brownian motion. Injection is rare, triggered by a threshold, and coupled to the
                 local value of the field. The field is overdamped too.
+              </dd>
+              <dd class="i18n" lang="fr">
+                Les particules suivent un mouvement brownien. L’injection est rare, déclenchée par un seuil, et couplée
+                à la valeur locale du champ. Le champ est lui aussi suramorti.
               </dd>
             </dl>
           </div>
@@ -69,234 +121,475 @@
       </section>
 
       <section>
-        <h2>The field</h2>
-        <p>
+        <h2 class="i18n" lang="en">The field</h2>
+        <h2 class="i18n" lang="fr">Le champ</h2>
+        <p class="i18n" lang="en">
           The background is a grid holding a scalar field <span class="math">c(x, y, t)</span>. It obeys a damped,
           non-linear wave equation:
         </p>
+        <p class="i18n" lang="fr">
+          Le fond est une grille qui porte un champ scalaire <span class="math">c(x, y, t)</span>. Il obéit à une
+          équation d’onde amortie et non linéaire&nbsp;:
+        </p>
         <p class="equation">τ<sub>c</sub> ∂²c/∂t² + ∂c/∂t = D<sub>c</sub> Δc − ν₁ c − ν₃ c³</p>
-        <ul>
+        <ul class="i18n" lang="en">
           <li><span class="math">D<sub>c</sub></span> sets how fast and far waves propagate (diffusion),</li>
           <li><span class="math">τ<sub>c</sub></span> is the characteristic time of the field, its inertia,</li>
-          <li><span class="math">ν₁</span> is a viscosity pulling the field back to rest,</li>
-          <li><span class="math">ν₃</span> damps large amplitudes and keeps the field from exploding.</li>
+          <li><span class="math">ν₁</span> is a linear damping coefficient, pulling the field back to rest,</li>
+          <li><span class="math">ν₃</span> is a cubic damping coefficient, damping large amplitudes and keeping the field from exploding.</li>
         </ul>
-        <p>
-          Walls are a second field, <span class="math">w(x, y)</span>, equal to 1 inside walls and 0 elsewhere. Waves cannot
-          cross them, so they reflect and diffract, and particles are pushed away from them.
+        <ul class="i18n" lang="fr">
+          <li><span class="math">D<sub>c</sub></span> fixe la vitesse et la portée de propagation des ondes (diffusion),</li>
+          <li><span class="math">τ<sub>c</sub></span> est le temps caractéristique du champ, son inertie,</li>
+          <li><span class="math">ν₁</span> est un coefficient d’amortissement linéaire, qui ramène le champ au repos,</li>
+          <li><span class="math">ν₃</span> est un coefficient d’amortissement cubique, qui atténue les grandes amplitudes et empêche le champ d’exploser.</li>
+        </ul>
+        <p class="i18n" lang="en">
+          Walls are modelled as a second field, <span class="math">w(x, y)</span>, equal to 1 inside walls and 0 elsewhere.
+          Waves cannot cross them, so they reflect and diffract, and particles are pushed away from them.
+        </p>
+        <p class="i18n" lang="en">
+          On top of these dynamics, particles inject extra energy into the field whenever their own energy crosses a
+          threshold (see <a href="#particles">The particles</a>).
+        </p>
+        <p class="i18n" lang="fr">
+          Les murs sont modélisés par un second champ, <span class="math">w(x, y)</span>, égal à 1 dans les murs et à 0
+          ailleurs. Les ondes ne peuvent pas les traverser&nbsp;: elles s’y réfléchissent et s’y diffractent, et les
+          particules en sont repoussées.
+        </p>
+        <p class="i18n" lang="fr">
+          En plus de cette dynamique, les particules injectent de l’énergie dans le champ chaque fois que leur propre
+          énergie franchit un seuil (voir <a href="#particles">Les particules</a>).
         </p>
 
         <details>
-          <summary>Technical details</summary>
+          <summary><span class="i18n" lang="en">Technical details</span><span class="i18n" lang="fr">Détails techniques</span></summary>
           <div class="details-body">
-            <h3>Time integration</h3>
-            <p>
+            <h3 class="i18n" lang="en">Time integration</h3>
+            <h3 class="i18n" lang="fr">Intégration temporelle</h3>
+            <p class="i18n" lang="en">
               The second-order equation is split into two first-order updates, on the field \(c\) and on its
               variation \(\dot c\), each with an optional numerical viscosity \(\eta\) (zero by default):
             </p>
-            \[ \dot c(t+dt) = (1-\eta_v)\left(1-\frac{dt}{\tau_c}\right)\dot c(t) + \frac{D_c}{\tau_c}\,\Delta c\,dt - \frac{\nu_1}{\tau_c}\,c\,dt - \frac{\nu_3}{\tau_c}\,c^3\,dt \]
+            <p class="i18n" lang="fr">
+              L’équation du second ordre est scindée en deux mises à jour du premier ordre, sur le champ \(c\) et sur
+              sa variation \(\dot c\), chacune avec une viscosité numérique optionnelle \(\eta\) (nulle par défaut)&nbsp;:
+            </p>
+            \[ \dot c(t+dt) = (1-\eta_v\,dt)\left(1-\frac{dt}{\tau_c}\right)\dot c(t) + \frac{D_c}{\tau_c}\,\Delta c\,dt - \frac{\nu_1}{\tau_c}\,c\,dt - \frac{\nu_3}{\tau_c}\,c^3\,dt \]
             \[ c(t+dt) = (1-\eta_c\,dt)\,c(t) + \dot c(t+dt)\,dt \]
-            <p>
+            <p class="i18n" lang="en">
               Values are then clamped to \([-1, 1]\) to protect against explosions. The grid is periodic: what
               leaves on one side comes back on the other.
             </p>
-            <p>
-              Physics runs at a fixed step of 12&nbsp;ms of machine time, \(dt' = dt \times 12\) with \(dt = 0.1\),
-              independently of the frame rate. A slow device runs several steps per frame (up to 8) to keep time
-              linear, and the scheme stays below its stability threshold on any device.
+            <p class="i18n" lang="fr">
+              Les valeurs sont ensuite bornées à \([-1, 1]\) pour éviter les explosions. La grille est périodique&nbsp;:
+              ce qui sort d’un côté revient de l’autre.
+            </p>
+            <h3 class="i18n" lang="en">Time step</h3>
+            <h3 class="i18n" lang="fr">Pas de temps</h3>
+            <p class="i18n" lang="en">
+              Physics advances by fixed steps of \(\Delta t_{machine} = 12\)&nbsp;ms of real time, independently of the
+              frame rate. Real time is converted into simulated time by a constant factor \(k = 0.1\) per millisecond
+              (the variable <code>dt</code> in the code), so each step advances the simulation by \(dt = k\,\Delta t_{machine} = 1.2\)
+              time units: this is the \(dt\) of every equation on this page.
+            </p>
+            <p class="i18n" lang="fr">
+              La physique avance par pas fixes de \(\Delta t_{machine} = 12\)&nbsp;ms de temps réel, indépendamment de la
+              fréquence d’affichage. Le temps réel est converti en temps simulé par un facteur constant \(k = 0{,}1\) par
+              milliseconde (la variable <code>dt</code> du code), si bien que chaque pas fait avancer la simulation de
+              \(dt = k\,\Delta t_{machine} = 1{,}2\) unité de temps&nbsp;: c’est le \(dt\) de toutes les équations de cette page.
+            </p>
+            <p class="i18n" lang="en">
+              One second of real time is 1000&nbsp;ms, that is \(1000 / 12 \approx 83\) steps of \(1.2\) units each, so
+              \(1000 \times k = 100\) units of simulated time, the units in which \(\tau_c\), \(\tau_u\) and the other
+              parameters are expressed. With \(\tau_c = 100\), the field’s characteristic time is about one second. A slow device runs several steps per frame (up to 8) to keep up with
+              real time. Since the step itself never changes, the scheme stays below its stability threshold on any device.
+            </p>
+            <p class="i18n" lang="fr">
+              Une seconde de temps réel dure 1000&nbsp;ms, soit \(1000 / 12 \approx 83\) pas de \(1{,}2\) unité chacun,
+              donc \(1000 \times k = 100\) unités de temps simulé, les unités dans lesquelles \(\tau_c\), \(\tau_u\) et
+              les autres paramètres sont exprimés. Avec \(\tau_c = 100\), le temps caractéristique du champ est d’environ
+              une seconde. Un appareil lent enchaîne plusieurs pas par
+              image (jusqu’à 8) pour suivre le temps réel. Comme le pas lui-même ne change jamais, le schéma reste sous son
+              seuil de stabilité sur tout appareil.
             </p>
 
-            <h3>Waves or spreading</h3>
-            <p>
+            <h3 class="i18n" lang="en">Waves or spreading</h3>
+            <h3 class="i18n" lang="fr">Ondes ou étalement</h3>
+            <p class="i18n" lang="en">
               Whether the field oscillates or only spreads out depends on its inertia \(\tau_c\). Neglecting the
-              viscosities, a mode of wavenumber \(q\), \(c \propto e^{i\vec q \cdot \vec r + st}\), satisfies
+              damping terms, a mode of wavenumber \(q\), \(c \propto e^{i\vec q \cdot \vec r + st}\), satisfies
               \(\tau_c s^2 + s + D_c q^2 = 0\). It oscillates, and waves propagate, when the roots are complex:
             </p>
+            <p class="i18n" lang="fr">
+              Que le champ oscille ou ne fasse que s’étaler dépend de son inertie \(\tau_c\). En négligeant les
+              termes d’amortissement, un mode de nombre d’onde \(q\), \(c \propto e^{i\vec q \cdot \vec r + st}\), vérifie
+              \(\tau_c s^2 + s + D_c q^2 = 0\). Il oscille, et des ondes se propagent, lorsque les racines sont
+              complexes&nbsp;:
+            </p>
             \[ \tau_c > \frac{1}{4\,q^2 D_c} \]
-            <p>
+            <p class="i18n" lang="en">
               Here \(D_c q^2\) is the rate at which that mode would relax by pure diffusion. Above this threshold the
               medium is inertial, like the bath of the walking droplets. Below it, the field is overdamped, as in the
               phoretic and elastoplastic models.
             </p>
+            <p class="i18n" lang="fr">
+              Ici, \(D_c q^2\) est le taux auquel ce mode relaxerait par diffusion pure. Au-dessus de ce seuil, le
+              milieu est inertiel, comme le bain des gouttes marcheuses. En dessous, le champ est suramorti, comme dans
+              les modèles phorétique et élastoplastique.
+            </p>
 
-            <h3>Discrete Laplacian</h3>
-            <p>On the grid, the Laplacian is estimated from a set of neighbouring cells \(\vec{dr}_k\):</p>
+            <h3 class="i18n" lang="en">Discrete Laplacian</h3>
+            <h3 class="i18n" lang="fr">Laplacien discret</h3>
+            <p class="i18n" lang="en">On the grid, the Laplacian is estimated from a set of neighbouring cells \(\vec{dr}_k\):</p>
+            <p class="i18n" lang="fr">Sur la grille, le laplacien est estimé à partir d’un ensemble de cellules voisines \(\vec{dr}_k\)&nbsp;:</p>
             \[ \Delta c(\vec r) = \frac{2 \sum_k \left[c(\vec r + \vec{dr}_k) - c(\vec r)\right]}{\sum_k \|\vec{dr}_k\|^2}, \qquad \vec{dr}_k = r_0\,\vec{dr}_k^{\,cell} \]
-            <p>
+            <p class="i18n" lang="en">
               where \(r_0\) is the cell-to-reality scale factor. The code supports three neighbourhoods: von Neumann 1
               (4 adjacent cells), hollow von Neumann 2 and Moore 1 (the 8 surrounding cells, used for the field).
             </p>
+            <p class="i18n" lang="fr">
+              où \(r_0\) est le facteur d’échelle entre la cellule et la réalité. Le code gère trois voisinages&nbsp;:
+              von Neumann 1 (les 4 cellules adjacentes), von Neumann 2 creux et Moore 1 (les 8 cellules environnantes,
+              utilisé pour le champ).
+            </p>
 
-            <h3>Coupling with walls</h3>
-            <p>Each term of the Laplacian is weighted by how free both cells are from walls:</p>
+            <h3 class="i18n" lang="en">Coupling with walls</h3>
+            <h3 class="i18n" lang="fr">Couplage avec les murs</h3>
+            <p class="i18n" lang="en">Each term of the Laplacian is weighted by how free both cells are from walls:</p>
+            <p class="i18n" lang="fr">Chaque terme du laplacien est pondéré selon que les deux cellules sont libres de murs&nbsp;:</p>
             \[ \Delta c(\vec r) = \frac{2}{\sum_k \|\vec{dr}_k\|^2} \sum_k \left(1 - \tfrac12\left[w(\vec r + \vec{dr}_k) + w(\vec r)\right]\right)\left[c(\vec r + \vec{dr}_k) - c(\vec r)\right] \]
-            <p>
+            <p class="i18n" lang="en">
               Between two free cells the usual Laplacian is recovered, and nothing flows into a wall. Inside walls,
               the field is held at zero.
+            </p>
+            <p class="i18n" lang="fr">
+              Entre deux cellules libres, on retrouve le laplacien habituel, et rien ne s’écoule dans un mur. À
+              l’intérieur des murs, le champ est maintenu à zéro.
             </p>
           </div>
         </details>
       </section>
 
-      <section>
-        <h2>The particles</h2>
-        <p>
+      <section id="particles">
+        <h2 class="i18n" lang="en">The particles</h2>
+        <h2 class="i18n" lang="fr">Les particules</h2>
+        <p class="i18n" lang="en">
           Each particle has a position <span class="math">r</span>, an orientation <span class="math">θ</span> and an internal
           energy <span class="math">u</span>. They behave like active Brownian particles:
         </p>
-        <p class="equation">dr/dt = v₀ e(θ) − µ ∇c − σ ∇w + √(2D<sub>p</sub>) ξ</p>
-        <p class="equation">dθ/dt = ω (cos θ ∂<sub>y</sub>c − sin θ ∂<sub>x</sub>c) + √(2D<sub>r</sub>) ξ</p>
+        <p class="i18n" lang="fr">
+          Chaque particule a une position <span class="math">r</span>, une orientation <span class="math">θ</span> et une
+          énergie interne <span class="math">u</span>. Elles se comportent comme des particules browniennes actives&nbsp;:
+        </p>
+        <p class="equation">dr/dt = v₀ e(θ) − µ ∇c − σ ∇w + √(2D<sub>p</sub>) ξ<sub>r</sub></p>
+        <p class="equation">dθ/dt = ω (cos θ ∂<sub>y</sub>c − sin θ ∂<sub>x</sub>c) + √(2D<sub>r</sub>) ξ<sub>θ</sub></p>
         <p class="equation">du/dt = 1/τ<sub>u</sub> + λ |c|</p>
-        <ul>
+        <ul class="i18n" lang="en">
           <li><span class="math">v₀</span> is a self-propulsion speed along the orientation,</li>
           <li><span class="math">µ</span> makes particles slide down the field gradient,</li>
           <li><span class="math">σ</span> sets how strongly walls push particles away,</li>
           <li><span class="math">ω</span> makes them turn according to the gradient,</li>
-          <li><span class="math">ξ</span> is random noise (Brownian motion, in position and rotation).</li>
+          <li><span class="math">ξ<sub>r</sub></span> and <span class="math">ξ<sub>θ</sub></span> are random white noise (Brownian motion, in <span class="math">r</span> and <span class="math">θ</span>).</li>
         </ul>
-        <p>
+        <ul class="i18n" lang="fr">
+          <li><span class="math">v₀</span> est une vitesse d’autopropulsion selon l’orientation,</li>
+          <li><span class="math">µ</span> fait glisser les particules le long de la pente du champ,</li>
+          <li><span class="math">σ</span> règle la force avec laquelle les murs repoussent les particules,</li>
+          <li><span class="math">ω</span> les fait tourner selon le gradient,</li>
+          <li><span class="math">ξ<sub>r</sub></span> et <span class="math">ξ<sub>θ</sub></span> sont des bruits blancs aléatoires (mouvement brownien, en <span class="math">r</span> et en <span class="math">θ</span>).</li>
+        </ul>
+        <p class="i18n" lang="en">
           Energy builds up over time, and faster where the field is strong. Once it crosses a threshold,
           the particle releases all of it into the field around it, creating a new ripple, and starts charging
           again. This is the bounce of the droplet: the particle writes the wave, the wave guides the particle.
         </p>
+        <p class="i18n" lang="fr">
+          L’énergie s’accumule avec le temps, et plus vite là où le champ est fort. Dès qu’elle franchit un seuil,
+          la particule la libère tout entière dans le champ autour d’elle, créant une nouvelle ondulation, puis
+          recommence à se charger. C’est le rebond de la goutte&nbsp;: la particule écrit l’onde, l’onde guide la particule.
+        </p>
+        <p class="i18n" lang="en">
+          The release is a direct transfer from the particle to the grid. The energy <span class="math">u</span> is shared
+          equally between the <span class="math">n</span> cells around the particle (its 8 neighbours by default) and
+          added to the field value <span class="math">c</span> of each of them, scaled by an injection gain
+          <span class="math">κ</span> (the <em>Energy injection</em> control of the app). The particle is then emptied:
+        </p>
+        <p class="i18n" lang="fr">
+          La libération est un transfert direct de la particule vers la grille. L’énergie <span class="math">u</span> est
+          partagée à parts égales entre les <span class="math">n</span> cellules autour de la particule (ses 8 voisines par
+          défaut) et ajoutée à la valeur du champ <span class="math">c</span> de chacune d’elles, pondérée par un gain
+          d’injection <span class="math">κ</span> (le contrôle <em>Injection d’énergie</em> de l’application). La
+          particule est ensuite vidée&nbsp;:
+        </p>
+        <p class="equation i18n" lang="en">c<sub>j</sub> ← c<sub>j</sub> + κ u / n &nbsp;for each neighbouring cell j, &nbsp;then&nbsp; u ← 0</p>
+        <p class="equation i18n" lang="fr">c<sub>j</sub> ← c<sub>j</sub> + κ u / n &nbsp;pour chaque cellule voisine j, &nbsp;puis&nbsp; u ← 0</p>
+        <figure class="diagram">
+          <svg viewBox="-70 0 364 224" width="488" height="300" role="img" aria-labelledby="injection-caption">
+              <rect class="cell far" x="2" y="2" width="40" height="40" rx="4" />
+              <rect class="cell far" x="46" y="2" width="40" height="40" rx="4" />
+              <rect class="cell far" x="90" y="2" width="40" height="40" rx="4" />
+              <rect class="cell far" x="134" y="2" width="40" height="40" rx="4" />
+              <rect class="cell far" x="178" y="2" width="40" height="40" rx="4" />
+              <rect class="cell far" x="2" y="46" width="40" height="40" rx="4" />
+              <rect class="cell neigh" x="46" y="46" width="40" height="40" rx="4" />
+              <text x="66" y="70">+κu/8</text>
+              <rect class="cell neigh" x="90" y="46" width="40" height="40" rx="4" />
+              <text x="110" y="70">+κu/8</text>
+              <rect class="cell neigh" x="134" y="46" width="40" height="40" rx="4" />
+              <text x="154" y="70">+κu/8</text>
+              <rect class="cell far" x="178" y="46" width="40" height="40" rx="4" />
+              <rect class="cell far" x="2" y="90" width="40" height="40" rx="4" />
+              <rect class="cell neigh" x="46" y="90" width="40" height="40" rx="4" />
+              <text x="66" y="114">+κu/8</text>
+              <rect class="cell" x="90" y="90" width="40" height="40" rx="4" />
+              <rect class="cell neigh" x="134" y="90" width="40" height="40" rx="4" />
+              <text x="154" y="114">+κu/8</text>
+              <rect class="cell far" x="178" y="90" width="40" height="40" rx="4" />
+              <rect class="cell far" x="2" y="134" width="40" height="40" rx="4" />
+              <rect class="cell neigh" x="46" y="134" width="40" height="40" rx="4" />
+              <text x="66" y="158">+κu/8</text>
+              <rect class="cell neigh" x="90" y="134" width="40" height="40" rx="4" />
+              <text x="110" y="158">+κu/8</text>
+              <rect class="cell neigh" x="134" y="134" width="40" height="40" rx="4" />
+              <text x="154" y="158">+κu/8</text>
+              <rect class="cell far" x="178" y="134" width="40" height="40" rx="4" />
+              <rect class="cell far" x="2" y="178" width="40" height="40" rx="4" />
+              <rect class="cell far" x="46" y="178" width="40" height="40" rx="4" />
+              <rect class="cell far" x="90" y="178" width="40" height="40" rx="4" />
+              <rect class="cell far" x="134" y="178" width="40" height="40" rx="4" />
+              <rect class="cell far" x="178" y="178" width="40" height="40" rx="4" />
+              <circle class="particle" cx="110" cy="110" r="7" />
+              <polyline class="leader" points="236,22 198,22" />
+              <circle class="leader-dot" cx="198" cy="22" r="2.5" />
+              <text class="annot" x="240" y="26">c(x, y)</text>
+          </svg>
+          <figcaption id="injection-caption">
+            <span class="i18n" lang="en">The particle shares its energy <strong>u</strong> between the 8 surrounding cells (Moore neighbourhood).</span>
+            <span class="i18n" lang="fr">La particule partage son énergie <strong>u</strong> entre les 8 cellules qui l’entourent (voisinage de Moore).</span>
+          </figcaption>
+        </figure>
 
         <details>
-          <summary>Technical details</summary>
+          <summary><span class="i18n" lang="en">Technical details</span><span class="i18n" lang="fr">Détails techniques</span></summary>
           <div class="details-body">
-            <h3>Update rules</h3>
-            <p>
+            <h3 class="i18n" lang="en">Update rules</h3>
+            <h3 class="i18n" lang="fr">Règles de mise à jour</h3>
+            <p class="i18n" lang="en">
               Each particle \(i\) is advanced with an Euler–Maruyama scheme, where \(\partial_x c\) and \(\partial_y c\)
               are the field gradient components at the particle's cell:
+            </p>
+            <p class="i18n" lang="fr">
+              Chaque particule \(i\) avance selon un schéma d’Euler–Maruyama, où \(\partial_x c\) et \(\partial_y c\)
+              sont les composantes du gradient du champ dans la cellule de la particule&nbsp;:
             </p>
             \[ \theta_i(t+dt) = \theta_i(t) + \omega\left(\cos\theta_i\,\partial_y c - \sin\theta_i\,\partial_x c\right)dt + \sqrt{2D_r\,dt}\;\xi_{\theta_i} \]
             \[ \vec v_i(t) = v_0\,\vec e(\theta_i) - \mu\,\vec\nabla c - \sigma\,\vec\nabla w \]
             \[ x_i(t+dt) = x_i(t) + v_{x_i}(t)\,dt + \sqrt{2D_p\,dt}\;\xi_{x_i} \]
             \[ y_i(t+dt) = y_i(t) + v_{y_i}(t)\,dt + \sqrt{2D_p\,dt}\;\xi_{y_i} \]
             \[ u_i(t+dt) = u_i(t) + \frac{dt}{\tau_u} + \lambda\,\left|c(x_i, y_i)\right|dt \]
-            <p>
+            <p class="i18n" lang="en">
               The rotation term is the vertical component of \(\omega\,\vec e(\theta_i) \times \vec\nabla c\): particles
               turn towards or away from the gradient depending on the sign of \(\omega\). The noises
               \(\xi_{\theta_i}, \xi_{x_i}, \xi_{y_i}\) follow a normal distribution \(\mathcal N(0, 1)\), drawn with the
               Box–Muller transform.
             </p>
+            <p class="i18n" lang="fr">
+              Le terme de rotation est la composante verticale de \(\omega\,\vec e(\theta_i) \times \vec\nabla c\)&nbsp;:
+              les particules se tournent vers le gradient ou s’en détournent selon le signe de \(\omega\). Les bruits
+              \(\xi_{\theta_i}, \xi_{x_i}, \xi_{y_i}\) suivent une loi normale \(\mathcal N(0, 1)\), tirée par la
+              transformation de Box–Muller.
+            </p>
 
-            <h3>Energy release</h3>
-            <p>
+            <h3 class="i18n" lang="en">Energy release</h3>
+            <h3 class="i18n" lang="fr">Libération de l’énergie</h3>
+            <p class="i18n" lang="en">
               When \(u_i(t+dt)\) exceeds the particle's threshold \(s_i\), the energy is injected into the field,
-              shared equally between the neighbouring cells, and \(u_i\) is reset to zero. A new threshold is then drawn:
+              shared equally between the neighbouring cells, and \(u_i\) is reset to zero:
+            </p>
+            <p class="i18n" lang="fr">
+              Lorsque \(u_i(t+dt)\) dépasse le seuil \(s_i\) de la particule, l’énergie est injectée dans le champ,
+              répartie à parts égales entre les cellules voisines, et \(u_i\) est remis à zéro&nbsp;:
+            </p>
+            \[ c(\vec r_j) \leftarrow c(\vec r_j) + \frac{\kappa}{\sqrt{N/10}}\,\frac{u_i}{n} \quad \forall\, j \in \mathcal V_i, \qquad u_i \leftarrow 0 \]
+            <p class="i18n" lang="en">
+              Here \(\mathcal V_i\) is the set of \(n\) cells around the particle (the 8-cell Moore neighbourhood by
+              default), \(\kappa\) the injection gain and \(N\) the population (see the notes below for the
+              \(\sqrt{N/10}\) factor). The energy goes straight into the field value \(c\), not into its variation
+              \(\dot c\): the wave equation then turns this bump into a ripple. A new threshold is then drawn:
+            </p>
+            <p class="i18n" lang="fr">
+              Ici, \(\mathcal V_i\) est l’ensemble des \(n\) cellules autour de la particule (le voisinage de Moore de 8
+              cellules par défaut), \(\kappa\) le gain d’injection et \(N\) la population (voir les notes plus bas pour
+              le facteur \(\sqrt{N/10}\)). L’énergie est versée directement dans la valeur du champ \(c\), et non dans
+              sa variation \(\dot c\)&nbsp;: l’équation d’onde transforme ensuite cette bosse en ondulation. Un nouveau
+              seuil est alors tiré&nbsp;:
             </p>
             \[ s_i = \alpha\,\left(-\ln U\right) + (1-\alpha), \qquad U \sim \mathcal U(0, 1] \]
-            <p>
+            <p class="i18n" lang="en">
               The stochasticity \(\alpha \in [0, 1]\) moves the threshold from a fixed value of 1 (\(\alpha = 0\)) to an
               exponentially distributed random value (\(\alpha = 1\)).
             </p>
+            <p class="i18n" lang="fr">
+              La stochasticité \(\alpha \in [0, 1]\) fait passer le seuil d’une valeur fixe égale à 1 (\(\alpha = 0\))
+              à une valeur aléatoire de loi exponentielle (\(\alpha = 1\)).
+            </p>
 
-            <h3>Walls</h3>
-            <p>Walls act on particles through a potential proportional to the wall field:</p>
+            <h3 class="i18n" lang="en">Walls</h3>
+            <h3 class="i18n" lang="fr">Murs</h3>
+            <p class="i18n" lang="en">Walls act on particles through a potential proportional to the wall field:</p>
+            <p class="i18n" lang="fr">Les murs agissent sur les particules par un potentiel proportionnel au champ des murs&nbsp;:</p>
             \[ \phi(x, y) = \sigma\,w(x, y) \quad\Longrightarrow\quad \vec F = -\vec\nabla\phi = -\sigma\,\vec\nabla w \]
-            <p>
+            <p class="i18n" lang="en">
               This force is added to the particle velocity. Particles that still end up inside a wall get their
               self-propulsion boosted so they find their way out.
+            </p>
+            <p class="i18n" lang="fr">
+              Cette force s’ajoute à la vitesse de la particule. Les particules qui se retrouvent malgré tout dans un
+              mur voient leur autopropulsion renforcée pour en sortir.
             </p>
           </div>
         </details>
       </section>
 
       <section>
-        <h2>The sound</h2>
-        <p>
+        <h2 class="i18n" lang="en">The sound</h2>
+        <h2 class="i18n" lang="fr">Le son</h2>
+        <p class="i18n" lang="en">
           The field is also an instrument. Depending on the mode, the grid is read as a raw audio signal,
           analysed through its frequency spectrum, or voiced by the particles themselves. What you hear is
           the same matter as what you see.
         </p>
+        <p class="i18n" lang="fr">
+          Le champ est aussi un instrument. Selon le mode, la grille est lue comme un signal audio brut, analysée à
+          travers son spectre de fréquences, ou mise en voix par les particules elles-mêmes. Ce que l’on entend est
+          la même matière que ce que l’on voit.
+        </p>
 
         <details>
-          <summary>Technical details</summary>
+          <summary><span class="i18n" lang="en">Technical details</span><span class="i18n" lang="fr">Détails techniques</span></summary>
           <div class="details-body">
-            <p>Four sound layers are mixed differently in each mode:</p>
+            <p class="i18n" lang="en">Four sound layers are mixed differently in each mode:</p>
+            <p class="i18n" lang="fr">Quatre couches sonores sont mélangées différemment dans chaque mode&nbsp;:</p>
             <dl class="families">
-              <dt>Raw grid</dt>
-              <dd>
+              <dt class="i18n" lang="en">Raw grid</dt>
+              <dt class="i18n" lang="fr">Grille brute</dt>
+              <dd class="i18n" lang="en">
                 The field values are played directly as a waveform. An audio worklet scans the grid cell after cell
                 at 44.1&nbsp;kHz, with about 17.6 samples per cell and linear interpolation between cells.
               </dd>
-              <dt>Spectrum</dt>
-              <dd>
+              <dd class="i18n" lang="fr">
+                Les valeurs du champ sont jouées directement comme une forme d’onde. Un worklet audio parcourt la grille
+                cellule après cellule à 44,1&nbsp;kHz, avec environ 17,6 échantillons par cellule et une interpolation
+                linéaire entre les cellules.
+              </dd>
+              <dt class="i18n" lang="en">Spectrum</dt>
+              <dt class="i18n" lang="fr">Spectre</dt>
+              <dd class="i18n" lang="en">
                 The whole grid is read as one signal and analysed with a 256-point FFT. A bank of 32 sine oscillators,
                 tuned to a C minor pentatonic scale across octaves, takes its loudness from the matching frequency bins.
               </dd>
-              <dt>Field tone</dt>
-              <dd>A sine oscillator whose pitch rises with the maximum amplitude of the field, \(f = 20 + \sqrt{500\,\max|c|}\) Hz.</dd>
-              <dt>Particles</dt>
-              <dd>A square wave whose pitch follows the total speed of the particles.</dd>
+              <dd class="i18n" lang="fr">
+                La grille entière est lue comme un seul signal et analysée par une FFT de 256 points. Un banc de 32
+                oscillateurs sinusoïdaux, accordés sur une gamme pentatonique de do mineur sur plusieurs octaves, tire
+                son volume des bandes de fréquences correspondantes.
+              </dd>
+              <dt class="i18n" lang="en">Field tone</dt>
+              <dt class="i18n" lang="fr">Tonalité du champ</dt>
+              <dd class="i18n" lang="en">A sine oscillator whose pitch rises with the maximum amplitude of the field, \(f = 20 + \sqrt{500\,\max|c|}\) Hz.</dd>
+              <dd class="i18n" lang="fr">Un oscillateur sinusoïdal dont la hauteur monte avec l’amplitude maximale du champ, \(f = 20 + \sqrt{500\,\max|c|}\) Hz.</dd>
+              <dt class="i18n" lang="en">Particles</dt>
+              <dt class="i18n" lang="fr">Particules</dt>
+              <dd class="i18n" lang="en">A square wave whose pitch follows the total speed of the particles.</dd>
+              <dd class="i18n" lang="fr">Une onde carrée dont la hauteur suit la vitesse totale des particules.</dd>
             </dl>
-            <p>Grid layers go through a 50&nbsp;Hz high-pass and a 3&nbsp;kHz low-pass filter.</p>
+            <p class="i18n" lang="en">Grid layers go through a 50&nbsp;Hz high-pass and a 3&nbsp;kHz low-pass filter.</p>
+            <p class="i18n" lang="fr">Les couches issues de la grille passent par un filtre passe-haut à 50&nbsp;Hz et un filtre passe-bas à 3&nbsp;kHz.</p>
           </div>
         </details>
       </section>
 
       <section>
-        <h2>The modes</h2>
+        <h2 class="i18n" lang="en">The modes</h2>
+        <h2 class="i18n" lang="fr">Les modes</h2>
         <dl>
-          <dt>The Playground</dt>
-          <dd>Two thousand particles and a field to stir with your pointer. Tune energy injection and diffusion.</dd>
-          <dt>The Tempest</dt>
-          <dd>Raindrops fall at random on the surface. Play with their intensity and frequency.</dd>
-          <dt>The Constellations</dt>
-          <dd>A dense swarm in which particles draw links to nearby partners, like stars in the night sky.</dd>
-          <dt>The Bouncing Droplets</dt>
-          <dd>A handful of self-propelled droplets, each surfing on its own wave and on the waves of the others.</dd>
-          <dt>The Interferences</dt>
-          <dd>A double-slit experiment: waves pass through two openings and interfere on the other side.</dd>
-          <dt>The Poem</dt>
-          <dd>Words are written into the field, letter by letter, and particles gather around their shapes.</dd>
+          <dt class="i18n" lang="en">The Playground</dt>
+          <dt class="i18n" lang="fr">Le Terrain de Jeu</dt>
+          <dd class="i18n" lang="en">Two thousand particles and a field to stir with your pointer. Tune energy injection and diffusion.</dd>
+          <dd class="i18n" lang="fr">Deux mille particules et un champ à remuer avec votre pointeur. Réglez l’injection d’énergie et la diffusion.</dd>
+          <dt class="i18n" lang="en">The Tempest</dt>
+          <dt class="i18n" lang="fr">La Tempête</dt>
+          <dd class="i18n" lang="en">Raindrops fall at random on the surface. Play with their intensity and frequency.</dd>
+          <dd class="i18n" lang="fr">Des gouttes de pluie tombent au hasard sur la surface. Jouez avec leur intensité et leur fréquence.</dd>
+          <dt class="i18n" lang="en">The Constellations</dt>
+          <dt class="i18n" lang="fr">Les Constellations</dt>
+          <dd class="i18n" lang="en">A dense swarm in which particles draw links to nearby partners, like stars in the night sky.</dd>
+          <dd class="i18n" lang="fr">Un essaim dense où les particules tissent des liens avec leurs voisines, comme des étoiles dans le ciel nocturne.</dd>
+          <dt class="i18n" lang="en">The Bouncing Droplets</dt>
+          <dt class="i18n" lang="fr">Les Gouttes Marcheuses</dt>
+          <dd class="i18n" lang="en">A handful of self-propelled droplets, each surfing on its own wave and on the waves of the others.</dd>
+          <dd class="i18n" lang="fr">Une poignée de gouttes autopropulsées, chacune surfant sur sa propre onde et sur celles des autres.</dd>
+          <dt class="i18n" lang="en">The Interferences</dt>
+          <dt class="i18n" lang="fr">Les Interférences</dt>
+          <dd class="i18n" lang="en">A double-slit experiment: waves pass through two openings and interfere on the other side.</dd>
+          <dd class="i18n" lang="fr">Une expérience des fentes de Young&nbsp;: les ondes traversent deux ouvertures et interfèrent de l’autre côté.</dd>
+          <dt class="i18n" lang="en">The Poem</dt>
+          <dt class="i18n" lang="fr">Le Poème</dt>
+          <dd class="i18n" lang="en">Words are written into the field, letter by letter, and particles gather around their shapes.</dd>
+          <dd class="i18n" lang="fr">Des mots s’écrivent dans le champ, lettre après lettre, et les particules se rassemblent autour de leurs formes.</dd>
         </dl>
 
         <details>
-          <summary>Technical details</summary>
+          <summary><span class="i18n" lang="en">Technical details</span><span class="i18n" lang="fr">Détails techniques</span></summary>
           <div class="details-body">
-            <p>Each mode starts from the Playground parameters and changes a few of them:</p>
+            <p class="i18n" lang="en">Each mode starts from the Playground parameters and changes a few of them:</p>
+            <p class="i18n" lang="fr">Chaque mode part des paramètres du Terrain de Jeu et en modifie quelques-uns&nbsp;:</p>
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr><th>Mode</th><th>Changes from the Playground</th><th>Controls</th><th>Sound</th></tr>
+                  <tr>
+                    <th>Mode</th>
+                    <th><span class="i18n" lang="en">Changes from the Playground</span><span class="i18n" lang="fr">Changements par rapport au Terrain de Jeu</span></th>
+                    <th><span class="i18n" lang="en">Controls</span><span class="i18n" lang="fr">Contrôles</span></th>
+                    <th><span class="i18n" lang="en">Sound</span><span class="i18n" lang="fr">Son</span></th>
+                  </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>The Playground</td>
-                    <td>2000 particles, \(D_c = 30\), \(\tau_c = 100\), \(\nu_1 = \nu_3 = 5\), \(\mu = 10\), \(\omega = -10\), \(D_r = 0.1\)</td>
-                    <td>Energy injection, diffusion</td>
-                    <td>Particles, field tone, spectrum</td>
+                    <td><span class="i18n" lang="en">The Playground</span><span class="i18n" lang="fr">Le Terrain de Jeu</span></td>
+                    <td><span class="i18n" lang="en">2000 particles</span><span class="i18n" lang="fr">2000 particules</span>, \(D_c = 30\), \(\tau_c = 100\), \(\nu_1 = \nu_3 = 5\), \(\mu = 10\), \(\omega = -10\), <span class="i18n" lang="en">\(D_r = 0.1\)</span><span class="i18n" lang="fr">\(D_r = 0{,}1\)</span></td>
+                    <td><span class="i18n" lang="en">Energy injection, diffusion</span><span class="i18n" lang="fr">Injection d’énergie, diffusion</span></td>
+                    <td><span class="i18n" lang="en">Particles, field tone, spectrum</span><span class="i18n" lang="fr">Particules, tonalité du champ, spectre</span></td>
                   </tr>
                   <tr>
-                    <td>The Tempest</td>
-                    <td>Random raindrops injected on the grid</td>
-                    <td>Rain intensity, rain quantity</td>
-                    <td>Particles, raw grid</td>
+                    <td><span class="i18n" lang="en">The Tempest</span><span class="i18n" lang="fr">La Tempête</span></td>
+                    <td><span class="i18n" lang="en">Random raindrops injected on the grid</span><span class="i18n" lang="fr">Gouttes de pluie aléatoires injectées sur la grille</span></td>
+                    <td><span class="i18n" lang="en">Rain intensity, rain quantity</span><span class="i18n" lang="fr">Intensité de la pluie, quantité de pluie</span></td>
+                    <td><span class="i18n" lang="en">Particles, raw grid</span><span class="i18n" lang="fr">Particules, grille brute</span></td>
                   </tr>
                   <tr>
-                    <td>The Constellations</td>
-                    <td>3000 particles, \(D_c = 90\), \(\nu_1 = 10\), links between partners</td>
-                    <td>Energy injection, viscosity</td>
-                    <td>Field tone, raw grid</td>
+                    <td><span class="i18n" lang="en">The Constellations</span><span class="i18n" lang="fr">Les Constellations</span></td>
+                    <td><span class="i18n" lang="en">3000 particles</span><span class="i18n" lang="fr">3000 particules</span>, \(D_c = 90\), \(\nu_1 = 10\), <span class="i18n" lang="en">links between partners</span><span class="i18n" lang="fr">liens entre voisines</span></td>
+                    <td><span class="i18n" lang="en">Energy injection, damping</span><span class="i18n" lang="fr">Injection d’énergie, amortissement</span></td>
+                    <td><span class="i18n" lang="en">Field tone, raw grid</span><span class="i18n" lang="fr">Tonalité du champ, grille brute</span></td>
                   </tr>
                   <tr>
-                    <td>The Bouncing Droplets</td>
-                    <td>6 particles, \(v_0 = 2\), \(\mu = 50\), no Brownian noise, gentle pointer</td>
-                    <td>Energy injection, gradient coupling</td>
-                    <td>Spectrum</td>
+                    <td><span class="i18n" lang="en">The Bouncing Droplets</span><span class="i18n" lang="fr">Les Gouttes Marcheuses</span></td>
+                    <td><span class="i18n" lang="en">6 particles</span><span class="i18n" lang="fr">6 particules</span>, \(v_0 = 2\), \(\mu = 50\), <span class="i18n" lang="en">no Brownian noise, gentle pointer</span><span class="i18n" lang="fr">sans bruit brownien, pointeur doux</span></td>
+                    <td><span class="i18n" lang="en">Energy injection, gradient coupling</span><span class="i18n" lang="fr">Injection d’énergie, couplage au gradient</span></td>
+                    <td><span class="i18n" lang="en">Spectrum</span><span class="i18n" lang="fr">Spectre</span></td>
                   </tr>
                   <tr>
-                    <td>The Interferences</td>
-                    <td>Caged grid with a double slit, 20 particles, \(\mu = 0\), \(D_c = 800\), strong injection</td>
-                    <td>Diffusion, energy injection</td>
-                    <td>Spectrum</td>
+                    <td><span class="i18n" lang="en">The Interferences</span><span class="i18n" lang="fr">Les Interférences</span></td>
+                    <td><span class="i18n" lang="en">Caged grid with a double slit, 20 particles</span><span class="i18n" lang="fr">Grille encagée avec une double fente, 20 particules</span>, \(\mu = 0\), \(D_c = 800\), <span class="i18n" lang="en">strong injection</span><span class="i18n" lang="fr">forte injection</span></td>
+                    <td><span class="i18n" lang="en">Diffusion, energy injection</span><span class="i18n" lang="fr">Diffusion, injection d’énergie</span></td>
+                    <td><span class="i18n" lang="en">Spectrum</span><span class="i18n" lang="fr">Spectre</span></td>
                   </tr>
                   <tr>
-                    <td>The Poem</td>
-                    <td>Pixel letters injected into the field, no pointer injection, \(D_c = 3\), \(\mu = 500\), \(v_0 = 20\)</td>
-                    <td>Word quantity, diffusion</td>
-                    <td>Spectrum</td>
+                    <td><span class="i18n" lang="en">The Poem</span><span class="i18n" lang="fr">Le Poème</span></td>
+                    <td><span class="i18n" lang="en">Pixel letters injected into the field, no pointer injection</span><span class="i18n" lang="fr">Lettres en pixels injectées dans le champ, pas d’injection au pointeur</span>, \(D_c = 3\), \(\mu = 500\), \(v_0 = 20\)</td>
+                    <td><span class="i18n" lang="en">Word quantity, diffusion</span><span class="i18n" lang="fr">Quantité de mots, diffusion</span></td>
+                    <td><span class="i18n" lang="en">Spectrum</span><span class="i18n" lang="fr">Spectre</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -307,41 +600,63 @@
 
       <section>
         <details class="notes">
-          <summary>Notes and code: where they differ</summary>
+          <summary><span class="i18n" lang="en">Notes and code: where they differ</span><span class="i18n" lang="fr">Notes et code&nbsp;: là où ils diffèrent</span></summary>
           <div class="details-body">
-            <p>
+            <p class="i18n" lang="en">
               The equations above follow the code. The original handwritten notes of the model differ from it on a few
               points:
             </p>
+            <p class="i18n" lang="fr">
+              Les équations ci-dessus suivent le code. Les notes manuscrites originales du modèle s’en écartent sur
+              quelques points&nbsp;:
+            </p>
             <ol>
-              <li>
+              <li class="i18n" lang="en">
                 <span class="tag tag-discuss">To discuss</span>
                 <strong>Energy coupling.</strong> The notes charge a particle with \(\lambda\,c\), the code with
                 \(\lambda\,|c|\). With the absolute value, a particle also gains energy in the troughs of the field, so
                 it charges up wherever the field is agitated, not only where it is positive.
               </li>
-              <li>
+              <li class="i18n" lang="fr">
+                <span class="tag tag-discuss">À discuter</span>
+                <strong>Couplage énergétique.</strong> Les notes chargent une particule avec \(\lambda\,c\), le code
+                avec \(\lambda\,|c|\). Avec la valeur absolue, une particule gagne aussi de l’énergie dans les creux du
+                champ&nbsp;: elle se charge partout où le champ est agité, et pas seulement là où il est positif.
+              </li>
+              <li class="i18n" lang="en">
                 <span class="tag tag-minor">Non-critical</span>
                 <strong>Threshold law.</strong> The notes write the new threshold as \(\alpha + (1-\alpha)(-\ln U)\), the
                 code as \(\alpha(-\ln U) + (1-\alpha)\). The role of \(\alpha\) is simply mirrored: in the code,
                 \(\alpha = 0\) gives a fixed threshold and \(\alpha = 1\) a fully random one.
               </li>
-              <li>
+              <li class="i18n" lang="fr">
+                <span class="tag tag-minor">Non critique</span>
+                <strong>Loi du seuil.</strong> Les notes écrivent le nouveau seuil \(\alpha + (1-\alpha)(-\ln U)\), le
+                code \(\alpha(-\ln U) + (1-\alpha)\). Le rôle de \(\alpha\) est simplement inversé&nbsp;: dans le code,
+                \(\alpha = 0\) donne un seuil fixe et \(\alpha = 1\) un seuil entièrement aléatoire.
+              </li>
+              <li class="i18n" lang="en">
                 <span class="tag tag-minor">Non-critical</span>
                 <strong>Wall smoothing.</strong> The notes smooth the wall field iteratively into a staircase going from
                 1 inside walls to 0 outside. In the code, \(w\) is strictly 0 or 1, so the wall force only acts at the
                 edge of walls.
               </li>
-              <li>
+              <li class="i18n" lang="fr">
+                <span class="tag tag-minor">Non critique</span>
+                <strong>Lissage des murs.</strong> Les notes lissent le champ des murs par itérations, en un escalier
+                allant de 1 dans les murs à 0 à l’extérieur. Dans le code, \(w\) vaut strictement 0 ou 1, si bien que la
+                force des murs n’agit qu’à leur bord.
+              </li>
+              <li class="i18n" lang="en">
                 <span class="tag tag-perf">Adaptive performance</span>
                 <strong>Machine time.</strong> The notes scale each step by the frame duration,
-                \(dt' = dt \times \Delta T_{image}\), so that time flows linearly whatever the frame rate. The code now
+                \(dt = k\,\Delta T_{image}\), so that time flows linearly whatever the frame rate. The code now
                 uses a fixed physics step of 12&nbsp;ms instead, and runs as many steps per frame as the elapsed time
                 requires. The physics remains coherent:
                 <ul>
                   <li>
                     Every step applies exactly the same discrete equations, so the dynamics no longer depend on the
-                    device. A variable \(dt'\) could exceed the stability limit of the scheme on a slow device.
+                    device. A variable \(dt\) could exceed the stability limit of the scheme on a slow device.
                   </li>
                   <li>
                     When a device cannot keep up, even with 8 steps per frame, the backlog is dropped: the simulation runs
@@ -359,24 +674,62 @@
                   </li>
                 </ul>
               </li>
+              <li class="i18n" lang="fr">
+                <span class="tag tag-perf">Performance adaptative</span>
+                <strong>Temps machine.</strong> Les notes multiplient chaque pas par la durée d’une image,
+                \(dt = k\,\Delta T_{image}\), pour que le temps s’écoule linéairement quelle que soit la
+                fréquence d’affichage. Le code utilise désormais un pas physique fixe de 12&nbsp;ms, et enchaîne autant
+                de pas par image que le temps écoulé l’exige. La physique reste cohérente&nbsp;:
+                <ul>
+                  <li>
+                    Chaque pas applique exactement les mêmes équations discrètes, si bien que la dynamique ne dépend plus
+                    de l’appareil. Un \(dt\) variable pourrait dépasser la limite de stabilité du schéma sur un appareil lent.
+                  </li>
+                  <li>
+                    Quand un appareil ne suit pas, même à 8 pas par image, le retard accumulé est abandonné&nbsp;: la
+                    simulation tourne plus lentement que le temps réel, mais reste correcte en temps de simulation.
+                  </li>
+                  <li>
+                    Au démarrage, les appareils lents reçoivent une grille plus grossière et moins de particules. Les
+                    cellules sont plus grandes, mais le laplacien est calculé en unités d’écran (\(r_0\) est la taille
+                    d’une cellule)&nbsp;: \(D_c\) garde donc le même sens et les ondes parcourent les mêmes distances à
+                    l’écran, avec moins de détails.
+                  </li>
+                  <li>
+                    L’injection de chaque particule est divisée par \(\sqrt{N/10}\) pour une population \(N\)&nbsp;: avec
+                    moins de particules, l’énergie totale apportée au champ diminue comme \(\sqrt N\), et non comme \(N\).
+                    Les profils légers paraissent un peu plus calmes, mais ne sont pas identiques à la simulation complète.
+                  </li>
+                </ul>
+              </li>
             </ol>
           </div>
         </details>
       </section>
 
       <section>
-        <h2>The code and AI</h2>
-        <p>
+        <h2 class="i18n" lang="en">The code and AI</h2>
+        <h2 class="i18n" lang="fr">Le code et l’IA</h2>
+        <p class="i18n" lang="en">
           Duality began as a prototype on CodePen and grew through three stages. The switch to AI assistance was
           progressive, with its share growing along the way.
         </p>
+        <p class="i18n" lang="fr">
+          Duality est né sous la forme d’un prototype sur CodePen et a grandi en trois étapes. Le passage à
+          l’assistance par IA s’est fait progressivement, sa part augmentant au fil du temps.
+        </p>
         <ol class="timeline">
-          <li>
+          <li class="i18n" lang="en">
             <p class="date">Spring 2025</p>
             <h3>The ideas</h3>
             <p>The first discussions on the concept and what to start with. Excitement about implementing a model to play with and let observers be surprised.</p>
           </li>
-          <li>
+          <li class="i18n" lang="fr">
+            <p class="date">Printemps 2025</p>
+            <h3>Les idées</h3>
+            <p>Les premières discussions sur le concept et sur ce par quoi commencer. L’enthousiasme d’implémenter un modèle avec lequel jouer, et qui puisse surprendre ceux qui l’observent.</p>
+          </li>
+          <li class="i18n" lang="en">
             <p class="date">From November 2025</p>
             <h3>Coding by hand</h3>
             <p>
@@ -385,7 +738,17 @@
               simple oscillators, and the keyboard controls were in place, in about 850 lines of JavaScript.
             </p>
           </li>
-          <li>
+          <li class="i18n" lang="fr">
+            <p class="date">À partir de novembre 2025</p>
+            <h3>Coder à la main</h3>
+            <p>
+              Les modèles ont pris forme sur papier et sur tableau blanc, puis dans le code, écrit sans aucune
+              assistance d’IA. À la fin de cette étape, les équations de la simulation étaient entièrement
+              implémentées, le moteur audio pilotait des oscillateurs simples et les contrôles au clavier étaient en
+              place, en environ 850 lignes de JavaScript.
+            </p>
+          </li>
+          <li class="i18n" lang="en">
             <p class="date">From April 2026</p>
             <h3>Coding by hand & with Gemini</h3>
             <p>
@@ -393,7 +756,17 @@
               devices of different computing power, and on gamepad controls. A lot of frustrating attempts at generating a sound that sounds good. The code reached about 1500 lines.
             </p>
           </li>
-          <li>
+          <li class="i18n" lang="fr">
+            <p class="date">À partir d’avril 2026</p>
+            <h3>Coder à la main et avec Gemini</h3>
+            <p>
+              Toujours écrit à la main, avec l’aide de Gemini pour l’orchestre sinusoïdal, pour l’adaptation des
+              performances à des appareils de puissances de calcul différentes, et pour les contrôles à la manette.
+              Beaucoup de tentatives frustrantes pour générer un son agréable à l’oreille. Le code a atteint environ
+              1500 lignes.
+            </p>
+          </li>
+          <li class="i18n" lang="en">
             <p class="date">From September 2026</p>
             <h3>Coding with Copilot and Claude</h3>
             <p>
@@ -402,65 +775,137 @@
               about 2150 lines.
             </p>
           </li>
+          <li class="i18n" lang="fr">
+            <p class="date">À partir de septembre 2026</p>
+            <h3>Coder avec Copilot et Claude</h3>
+            <p>
+              Copilot et Claude ont aidé à ajouter le dernier mode, le Poème, à améliorer l’interface, à construire le
+              guide des contrôles, et à rédiger cette page à partir de notes manuscrites décrivant précisément tous les
+              modèles, rassemblées dans un PDF. Le code compte aujourd’hui environ 2150 lignes.
+            </p>
+          </li>
         </ol>
       </section>
 
       <section id="carbon">
-        <h2>Carbon impact</h2>
-        <p>
+        <h2 class="i18n" lang="en">Carbon impact</h2>
+        <h2 class="i18n" lang="fr">Impact carbone</h2>
+        <p class="i18n" lang="en">
           The carbon footprint of all activities of the artist Alex Andrix, including this project and its AI usage,
           is measured and published at <a href="https://alexandrix.com/about" target="_blank" rel="noopener">alexandrix.com/about</a>. These metrics
           cover the artistic practice as a whole, so the share of this project is not tracked on its own.
         </p>
+        <p class="i18n" lang="fr">
+          L’empreinte carbone de l’ensemble des activités de l’artiste Alex Andrix, y compris ce projet et son usage
+          de l’IA, est mesurée et publiée sur <a href="https://alexandrix.com/about" target="_blank" rel="noopener">alexandrix.com/about</a>.
+          Ces mesures couvrent la pratique artistique dans son ensemble&nbsp;: la part de ce projet n’est donc pas
+          suivie séparément.
+        </p>
       </section>
 
       <section>
-        <h2>The art</h2>
+        <h2 class="i18n" lang="en">The art</h2>
+        <h2 class="i18n" lang="fr">L’art</h2>
         <blockquote class="epigraph">
           <p lang="fr">« J’ai rêvé d’être une onde », s’écrie la particule<br />Alors qu’en elle s’éveille la partie qui ondule</p>
-          <p class="translation">“I dreamt of being a wave,” cries the particle,<br />As within it awakens the part that ripples.</p>
+          <p class="translation i18n" lang="en">“I dreamt of being a wave,” cries the particle,<br />As within it awakens the part that ripples.</p>
         </blockquote>
-        <p>
+        <p class="i18n" lang="en">
           Duality was born in spring 2025 as a co-creation between Eric Bertin and Alex Andrix, started with no
           idea of what form it would take. Only a question: which dualities? Rigour and creativity, man and woman,
           wave and particle. And beneath them, the very concept of duality.
         </p>
-        <p class="note">
-          Dr. Eric Bertin is a physicist at the Laboratoire Interdisciplinaire de Physique (LIPhy), Université
-          Grenoble Alpes, working on the statistical physics of non-equilibrium systems such as active and soft
+        <p class="i18n" lang="fr">
+          Duality est né au printemps 2025 d’une co-création entre Eric Bertin et Alex Andrix, commencée sans aucune
+          idée de la forme qu’elle prendrait. Seulement une question&nbsp;: quelles dualités&nbsp;? La rigueur et la
+          créativité, l’homme et la femme, l’onde et la particule. Et, sous-jacent à tout cela, le concept même de dualité.
+        </p>
+        <p class="note i18n" lang="en">
+          Dr. Eric Bertin is a physicist at the Laboratoire Interdisciplinaire de Physique (LIPhy, CNRS / Université
+          Grenoble Alpes), working on the statistical physics of non-equilibrium systems such as active and soft
           matter. Publications and personal page:
           <a href="https://liphy-annuaire.univ-grenoble-alpes.fr/pages_personnelles/eric_bertin/pub_full.html" target="_blank" rel="noopener">LIPhy – Eric Bertin</a>.
         </p>
-        <p>
+        <p class="note i18n" lang="fr">
+          Eric Bertin est physicien au Laboratoire Interdisciplinaire de Physique (LIPhy, CNRS / Université Grenoble Alpes),
+          où il travaille sur la physique statistique des systèmes hors d’équilibre, comme la matière active et la
+          matière molle. Publications et page personnelle&nbsp;:
+          <a href="https://liphy-annuaire.univ-grenoble-alpes.fr/pages_personnelles/eric_bertin/pub_full.html" target="_blank" rel="noopener">LIPhy – Eric Bertin</a>.
+        </p>
+        <p class="i18n" lang="en">
           From a classical point of view, waves and particles are well defined. Quantum objects behave dually, with
           the properties of both, but the theory says nothing about how to picture the system between two
           measurements. Rather than dwell on that mystery, we chose to stay on the classical side, with no
           ambiguity about whether things exist. Bouncing droplets are such an object: a composite that is both
           wave and particle at once. No ontological mystery here, both simply exist at the same time.
         </p>
-        <p>
+        <p class="i18n" lang="fr">
+          D’un point de vue classique, ondes et particules sont bien définies. Les objets quantiques se comportent de
+          manière duale, avec les propriétés des unes et des autres, mais la théorie ne dit rien de la façon de se
+          représenter le système entre deux mesures. Plutôt que de nous attarder sur ce mystère, nous avons choisi de
+          rester du côté classique, sans ambiguïté sur l’existence des choses. Les gouttes marcheuses sont un tel
+          objet&nbsp;: un composite à la fois onde et particule. Pas de mystère ontologique ici, les deux existent
+          simplement en même temps.
+        </p>
+        <p class="i18n" lang="en">
           So we play with classical models: a single physical object, a wave propagating on a network of cells,
           waves turned into sound and into music. And with two questions, asked from the inside:
         </p>
-        <p class="questions">
+        <p class="i18n" lang="fr">
+          Nous jouons donc avec des modèles classiques&nbsp;: un seul objet physique, une onde qui se propage sur un
+          réseau de cellules, des ondes transformées en son et en musique. Et avec deux questions, posées de
+          l’intérieur&nbsp;:
+        </p>
+        <p class="questions i18n" lang="en">
           I am a particle: how does it show in the world around me?<br />
           I am a wave: how does it show in the world around me?
         </p>
-        <p>
-          We did not force ourselves to carry the logic all the way, to the point of using the same mathematical
-          model as both artistic and scientific source. The equations used in the project have been defined by Eric Bertin on a whiteboard and coded by Alex Andrix. As such, they are grounded in real physics, but the parameters are chosen for what they show and what they sound like. The work went back and forth like a game of ping-pong, between
+        <p class="questions i18n" lang="fr">
+          Je suis une particule&nbsp;: comment cela se manifeste-t-il dans le monde qui m’entoure&nbsp;?<br />
+          Je suis une onde&nbsp;: comment cela se manifeste-t-il dans le monde qui m’entoure&nbsp;?
+        </p>
+        <p class="i18n" lang="en">
+          The equations used in the project have been defined by Eric Bertin on a whiteboard and coded by Alex Andrix. As such, they are grounded in real physics, but the parameters are chosen for what they show and what they sound like. The work went back and forth like a game of ping-pong, between
           theory and simulated play, with the pleasure of exploring as its compass.
         </p>
+        <p class="i18n" lang="fr">
+          Les équations utilisées dans le projet ont été définies par Eric Bertin sur un tableau blanc et codées par Alex Andrix. Elles sont donc ancrées dans
+          une physique réelle, mais les paramètres sont choisis pour ce qu’ils montrent et pour ce qu’ils font
+          entendre. Le travail a avancé comme une partie de ping-pong, entre théorie et jeu simulé, avec le plaisir
+          d’explorer pour boussole.
+        </p>
         <blockquote class="quote">
-          <p>“Saying <em>I</em> is at the heart of the artistic process.”</p>
+          <p class="i18n" lang="en">“Saying <em>I</em> is at the heart of the artistic process.”</p>
+          <p class="i18n" lang="fr">«&nbsp;Dire <em>je</em> est au cœur de la démarche artistique.&nbsp;»</p>
           <cite>Eric Bertin</cite>
         </blockquote>
-        <p>Am I a particle? Am I a wave? Have fun finding out, and be careful with your precious ears: keep the sound low.</p>
+        <p class="i18n" lang="en">
+          The main realisation this project brought us, as humans, is that we are all connected to our environment.
+          It is an entanglement, a never-ending feedback playing out on many levels: our presence in a space, the way we
+          decorate it, our social interactions, our care for the planet, our aura, our words… Each of us leaves a kind
+          of echo along our trail, often without knowing the impact it has. And while duality in quantum physics felt
+          intellectually uncomfortable, it became comfortable through this “classical” project, thanks to the sensory feedback loop – sound and
+          image – that we can have fun with live.
+        </p>
+        <p class="i18n" lang="fr">
+          La principale prise de conscience que ce projet nous a apportée, en tant qu’humains, est que nous sommes tous
+          reliés à notre environnement. C’est une intrication, une rétroaction sans fin qui se joue à plusieurs
+          niveaux&nbsp;: notre présence dans un espace, la façon dont nous le décorons, nos interactions sociales, le soin
+          que nous portons à la planète, notre aura, nos mots… Chacun de nous laisse sur son passage une sorte d’écho,
+          souvent sans connaître l’impact qu’il a. Et si la dualité de la physique quantique nous mettait intellectuellement mal à l’aise,
+          elle est devenue confortable à travers ce projet «&nbsp;classique&nbsp;», grâce à la boucle de rétroaction
+          sensible&nbsp;– son et image&nbsp;– avec laquelle on peut s’amuser en direct.
+        </p>
+        <p class="i18n" lang="en">Am I a particle? Am I a wave? Have fun finding out.</p>
+        <p class="i18n" lang="fr">Suis-je une particule&nbsp;? Suis-je une onde&nbsp;? Amusez-vous à le découvrir.</p>
       </section>
 
       <footer>
         <p>Eric Bertin &amp; Alex Andrix</p>
-        <a href="../" class="pill">← Back to Duality</a>
+        <a href="../" class="pill">
+          <span class="i18n" lang="en">← Back to Duality</span>
+          <span class="i18n" lang="fr">← Retour à Duality</span>
+        </a>
       </footer>
     </main>
   </body>

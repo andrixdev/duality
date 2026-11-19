@@ -126,7 +126,13 @@ canvas {
 }
 
 
-.delta-tms, .about-link {
+/* FR/EN switch: elements tagged .i18n only show in the current language */
+html[lang="en"] .i18n:not([lang="en"]),
+html[lang="fr"] .i18n:not([lang="fr"]) {
+  display: none !important;
+}
+
+.delta-tms, .about-link, .lang-toggle {
   position: fixed;
   left: 50%;
   bottom: 18px;
@@ -168,4 +174,29 @@ canvas {
     background: rgba(2, 4, 12, 0.8);
     border-color: rgba(255,255,255,0.6);
   }
+}
+
+.lang-toggle {
+  top: 18px;
+  bottom: auto;
+  left: auto;
+  right: 18px;
+  transform: none;
+  gap: 0.35rem;
+  font-size: 1rem;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background 200ms, border-color 200ms;
+
+  &:hover, &:focus-visible {
+    background: rgba(2, 4, 12, 0.8);
+    border-color: rgba(255,255,255,0.6);
+  }
+  .lang-opt, .lang-sep {
+    opacity: 0.45;
+  }
+}
+html[lang="en"] .lang-opt[data-lang="en"],
+html[lang="fr"] .lang-opt[data-lang="fr"] {
+  opacity: 1;
 }

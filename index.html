@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Duality</title>
+    <script src="./lang.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Quintessential&family=Tangerine:wght@400;700&display=swap" rel="stylesheet" />
@@ -36,9 +37,21 @@
 
     <!-- Gamepad Instruction Still Image -->
     <div id="guide-overlay">
-      <a href="./about/" class="about-link">About physics &amp; art</a>
-      <img src="./gamepad_guide.svg" class="gamepad-guide" alt="Gamepad controls guide" />
-      <img src="./keyboard_guide.svg" class="gamepad-guide" alt="Keyboard controls guide" />
+      <a href="./about/" class="about-link">
+        <span class="i18n" lang="en">About physics &amp; art</span>
+        <span class="i18n" lang="fr">Physique &amp; art</span>
+      </a>
+      <button type="button" class="lang-toggle" aria-label="Passer en français">
+        <span class="lang-opt" data-lang="fr">FR</span><span class="lang-sep">/</span><span class="lang-opt" data-lang="en">EN</span>
+      </button>
+      <img src="./gamepad_guide.svg" class="gamepad-guide" alt="Gamepad controls guide"
+        data-i18n-attrs="src alt"
+        data-src-en="./gamepad_guide.svg" data-alt-en="Gamepad controls guide"
+        data-src-fr="./gamepad_guide_fr.svg" data-alt-fr="Guide des contrôles à la manette" />
+      <img src="./keyboard_guide.svg" class="gamepad-guide" alt="Keyboard controls guide"
+        data-i18n-attrs="src alt"
+        data-src-en="./keyboard_guide.svg" data-alt-en="Keyboard controls guide"
+        data-src-fr="./keyboard_guide_fr.svg" data-alt-fr="Guide des contrôles au clavier et à la souris" />
     </div>
 
     <script src="./script.js"></script>
