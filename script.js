@@ -58,6 +58,36 @@ const baseParams = {
   fullModeName: "The Playground"
 }
 let params = structuredClone(baseParams)
+
+// Audio mixer: live gain trims (multipliers, default 1) applied on top of each mode's audio params
+// One global master + per view (mode 1 to 6): view master and the 4 sound components. Hidden panel toggled with Space.
+const AUDIO_MIX_STORAGE_KEY = "duality:audioMix"
+const audioMixChannels = ["master", "particles", "basicGrid", "rawGrid", "fft"]
+let makeDefaultAudioMix = () => ({
+  master: 1,
+  particlesStereo: false, // Particles osc: false = mono (whole population), true = left/right halves to left/right speakers
+  views: Array.from({ length: 6 }, () => Object.fromEntries(audioMixChannels.map(c => [c, 1])))
+})
+let loadAudioMix = () => {
+  let mix = makeDefaultAudioMix()
+  try {
+    let stored = JSON.parse(localStorage.getItem(AUDIO_MIX_STORAGE_KEY))
+    if (stored && typeof stored == "object") {
+      if (Number.isFinite(stored.master)) mix.master = stored.master
+      if (typeof stored.particlesStereo == "boolean") mix.particlesStereo = stored.particlesStereo
+      mix.views.forEach((view, i) => {
+        let s = stored.views && stored.views[i]
+        if (s) audioMixChannels.forEach(c => { if (Number.isFinite(s[c])) view[c] = s[c] })
+      })
+    }
+  } catch (e) {}
+  return mix
+}
+let saveAudioMix = () => {
+  try { localStorage.setItem(AUDIO_MIX_STORAGE_KEY, JSON.stringify(audioMix)) } catch (e) {}
+}
+let audioMix = loadAudioMix()
+
 let autoPerformance = {
   isEnabled: true,
   hasLockedProfile: false,
@@ -365,7 +395,9 @@ let initGridGeometry = () => {
 initGridGeometry()
 let audioMetrics = {
   iGridMax: 100,
-  particlesTotalSpeed: 0
+  particlesTotalSpeed: 0,
+  particlesLeftSpeed: 0, // stereo mode: particles on the left half of the simulation
+  particlesRightSpeed: 0 // stereo mode: particles on the right half
 }
 const vonNeumannNeighborhood1 = [
   [0, -1],
@@ -1467,10 +1499,30 @@ class Explaudio {
     this.particlesGainNode = this.audioCtx.createGain()
     this.particlesGainNode.connect(this.masterGainNode)
     
-    // Particles single oscillator
+    // Particles oscillators: one per half of the simulation (left/right)
+    // Mono: the left oscillator plays the whole population through the mono route (original behavior)
+    // Stereo: each oscillator plays its own half, hard-panned to its speaker
     this.particleOscillator = this.audioCtx.createOscillator()
     this.particleOscillator.type = "square"
-    this.particleOscillator.connect(this.particlesGainNode)
+    this.particleOscillatorRight = this.audioCtx.createOscillator()
+    this.particleOscillatorRight.type = "square"
+
+    this.particlesMonoGainNode = this.audioCtx.createGain()
+    this.particleOscillator.connect(this.particlesMonoGainNode)
+    this.particlesMonoGainNode.connect(this.particlesGainNode)
+
+    let makeStereoSide = (oscillator, pan) => {
+      const gainNode = this.audioCtx.createGain()
+      gainNode.gain.value = 0
+      const panner = this.audioCtx.createStereoPanner()
+      panner.pan.value = pan
+      oscillator.connect(gainNode)
+      gainNode.connect(panner)
+      panner.connect(this.particlesGainNode)
+      return gainNode
+    }
+    this.particlesLeftGainNode = makeStereoSide(this.particleOscillator, -1)
+    this.particlesRightGainNode = makeStereoSide(this.particleOscillatorRight, 1)
     
     // Grid single oscillator and gain
     this.gridOscillator = this.audioCtx.createOscillator()
@@ -1615,21 +1667,36 @@ class Explaudio {
     this.gridOscillator.frequency.setValueAtTime(30, this.audioCtx.currentTime)
    
     this.particleOscillator.start()
+    this.particleOscillatorRight.start()
     this.gridOscillator.start()
     
     // FFT sinusoidal orchestra (start oscillators)
     this.oscillatorBank.forEach(o => o.start())
   }
   update(gridChunkForWorklet) {
-    // Update gains
-    this.particlesGainNode.gain.value = params.audioEnableParticles ? 0.02 * params.audioParticlesGain : 0
-    this.gridOscillatorGainNode.gain.value = params.audioEnableBasicGrid ? 0.1 * params.audioBasicGridGain : 0
-    this.rawGridGainNode.gain.value = params.audioEnableRawGrid ? params.audioRawGridGain : 0
-    this.oscBankMasterGain.gain.value = 0.2 * params.audioFftGain
+    // Update gains (mode params x live mixer trims for the current view)
+    const mix = audioMix.views[mode - 1]
+    this.masterGainNode.gain.value = audioMix.master * mix.master
+    this.particlesGainNode.gain.value = params.audioEnableParticles ? 0.02 * params.audioParticlesGain * mix.particles : 0
+    this.gridOscillatorGainNode.gain.value = params.audioEnableBasicGrid ? 0.1 * params.audioBasicGridGain * mix.basicGrid : 0
+    this.rawGridGainNode.gain.value = params.audioEnableRawGrid ? params.audioRawGridGain * mix.rawGrid : 0
+    this.oscBankMasterGain.gain.value = 0.2 * params.audioFftGain * mix.fft
     
-    // Particles oscillator
-    let particlesFreq = Math.min(10000, audioMetrics.particlesTotalSpeed * .5)
-    this.particleOscillator.frequency.setValueAtTime(particlesFreq, this.audioCtx.currentTime)
+    // Particles oscillators
+    const stereo = audioMix.particlesStereo
+    this.particlesMonoGainNode.gain.value = stereo ? 0 : 1
+    this.particlesLeftGainNode.gain.value = stereo ? 1 : 0
+    this.particlesRightGainNode.gain.value = stereo ? 1 : 0
+    if (stereo) {
+      // Each half holds ~half the population: factor 1 (instead of .5) keeps the same pitch register as mono
+      let leftFreq = Math.min(10000, audioMetrics.particlesLeftSpeed * 1)
+      let rightFreq = Math.min(10000, audioMetrics.particlesRightSpeed * 1)
+      this.particleOscillator.frequency.setValueAtTime(leftFreq, this.audioCtx.currentTime)
+      this.particleOscillatorRight.frequency.setValueAtTime(rightFreq, this.audioCtx.currentTime)
+    } else {
+      let particlesFreq = Math.min(10000, audioMetrics.particlesTotalSpeed * .5)
+      this.particleOscillator.frequency.setValueAtTime(particlesFreq, this.audioCtx.currentTime)
+    }
     //let particleGainValue = 0.05 * Math.min(1, 0.25 + 0.75 * audioMetrics.particlesTotalSpeed * .05)
     //this.particlesGainNode.gain.setTargetAtTime(particleGainValue, this.audioCtx.currentTime + 0.25, 0.5)
     
@@ -2015,6 +2082,169 @@ class Gamepad {
   }
 }
 
+// Audio mixer panel (Space to toggle, intentionally not in the guide): live gain trims for on-site tuning
+class AudioMixerPanel {
+  constructor() {
+    this.channelLabels = { master: "Local master", particles: "Particles osc", basicGrid: "Basic grid osc", rawGrid: "Raw grid", fft: "FFT synth" }
+    this.enabledByView = this.computeEnabledChannels()
+    this.selectedView = mode
+    this.build()
+    this.refresh()
+
+    window.addEventListener("keydown", ev => {
+      if (ev.code != "Space") return
+      ev.preventDefault() // no page scroll, no button/slider activation
+      if (!ev.repeat) this.toggle()
+    })
+  }
+  // Which components each view actually plays (read from updateModeParams so it never drifts)
+  computeEnabledChannels() {
+    let savedMode = mode, savedParams = params, result = []
+    for (let m = 1; m <= 6; m++) {
+      mode = m
+      updateModeParams()
+      result.push({
+        master: true,
+        particles: params.audioEnableParticles,
+        basicGrid: params.audioEnableBasicGrid,
+        rawGrid: params.audioEnableRawGrid,
+        fft: params.audioEnableFft
+      })
+    }
+    mode = savedMode
+    params = savedParams
+    return result
+  }
+  makeSlider(label, get, set, max = 3) {
+    let row = document.createElement("label")
+    row.className = "mixer-row"
+    row.innerHTML = `<span class="mixer-label"></span><input type="range" min="0" max="${max}" step="0.01"><input type="number" min="0" max="${max}" step="0.01">`
+    row.querySelector(".mixer-label").textContent = label
+    let [range, num] = row.querySelectorAll("input")
+    let apply = (v, source) => {
+      v = Number(v)
+      if (!Number.isFinite(v)) return
+      v = Math.min(max, Math.max(0, v))
+      set(v)
+      if (source != range) range.value = v
+      num.value = v.toFixed(2) // also shows the clamped value if a typed one was out of range
+      saveAudioMix()
+    }
+    range.addEventListener("input", () => apply(range.value, range))
+    num.addEventListener("change", () => apply(num.value, num))
+    row.addEventListener("dblclick", () => apply(1)) // double-click resets to unity
+    row.sync = () => { let v = get(); range.value = v; num.value = v.toFixed(2) }
+    return row
+  }
+  build() {
+    let el = this.el = document.createElement("div")
+    el.id = "audio-mixer"
+    el.hidden = true
+    el.innerHTML = `
+      <div class="mixer-head"><span>Audio mixer</span><button type="button" class="mixer-close" aria-label="Close">×</button></div>
+      <div class="mixer-global">
+        <div class="mixer-row mixer-stereo">
+          <span class="mixer-label">Particles osc</span>
+          <div class="mixer-switch" role="radiogroup" aria-label="Particles osc output">
+            <button type="button" data-stereo="false" role="radio">Mono</button>
+            <button type="button" data-stereo="true" role="radio">Stereo</button>
+          </div>
+        </div>
+      </div>
+      <div class="mixer-tabs"></div>
+      <div class="mixer-view-name"></div>
+      <div class="mixer-channels"></div>
+      <div class="mixer-actions">
+        <button type="button" data-act="reset-view">Reset view</button>
+        <button type="button" data-act="reset-all">Reset all</button>
+        <button type="button" data-act="copy">Copy JSON</button>
+      </div>
+      <p class="mixer-hint">Multipliers on top of each view's settings · double-click a row to reset to 1 · saved on this device</p>`
+
+    // Keep keys typed in the panel away from the simulation shortcuts (arrows, Q/W, B...)
+    let stopKeys = ev => { if (ev.code != "Space") ev.stopPropagation() }
+    el.addEventListener("keydown", stopKeys)
+    el.addEventListener("keyup", stopKeys)
+
+    this.rows = []
+    let globalRow = this.makeSlider("Global master", () => audioMix.master, v => audioMix.master = v)
+    el.querySelector(".mixer-global").prepend(globalRow)
+    this.rows.push(globalRow)
+
+    this.stereoButtons = el.querySelectorAll(".mixer-switch button")
+    this.stereoButtons.forEach(b => b.addEventListener("click", () => {
+      audioMix.particlesStereo = b.dataset.stereo == "true"
+      saveAudioMix()
+      this.refresh()
+    }))
+
+    let tabs = el.querySelector(".mixer-tabs")
+    this.tabs = []
+    for (let m = 1; m <= 6; m++) {
+      let tab = document.createElement("button")
+      tab.type = "button"
+      tab.textContent = m
+      tab.addEventListener("click", () => { this.selectedView = m; this.refresh() })
+      tabs.append(tab)
+      this.tabs.push(tab)
+    }
+
+    let channels = el.querySelector(".mixer-channels")
+    this.channelRows = {}
+    audioMixChannels.forEach(c => {
+      let row = this.makeSlider(this.channelLabels[c], () => audioMix.views[this.selectedView - 1][c], v => audioMix.views[this.selectedView - 1][c] = v, c == "master" ? 3 : 5)
+      channels.append(row)
+      this.rows.push(row)
+      this.channelRows[c] = row
+    })
+
+    el.querySelector(".mixer-close").addEventListener("click", () => this.toggle(false))
+    el.querySelector(".mixer-actions").addEventListener("click", ev => {
+      let act = ev.target.dataset && ev.target.dataset.act
+      if (act == "reset-view") audioMix.views[this.selectedView - 1] = makeDefaultAudioMix().views[0]
+      else if (act == "reset-all") audioMix = makeDefaultAudioMix()
+      else if (act == "copy") {
+        let json = JSON.stringify(audioMix, null, 2)
+        console.log("Audio mix:", json)
+        if (navigator.clipboard) navigator.clipboard.writeText(json).catch(() => {})
+        return
+      }
+      else return
+      saveAudioMix()
+      this.refresh()
+    })
+
+    document.body.append(el)
+  }
+  // Called on mode change: follow the playing view
+  onModeChange() {
+    this.selectedView = mode
+    this.refresh()
+  }
+  refresh() {
+    this.tabs.forEach((tab, i) => {
+      tab.classList.toggle("selected", i + 1 == this.selectedView)
+      tab.classList.toggle("playing", i + 1 == mode)
+    })
+    let name = ["The Playground", "The Tempest", "The Constellations", "The Bouncing Droplets", "The Interferences", "The Poem"][this.selectedView - 1]
+    this.el.querySelector(".mixer-view-name").textContent = `${this.selectedView}. ${name}${this.selectedView == mode ? " (playing)" : ""}`
+    let enabled = this.enabledByView[this.selectedView - 1]
+    audioMixChannels.forEach(c => this.channelRows[c].classList.toggle("inactive", !enabled[c]))
+    this.rows.forEach(r => r.sync())
+    this.stereoButtons.forEach(b => {
+      let on = (b.dataset.stereo == "true") == audioMix.particlesStereo
+      b.classList.toggle("selected", on)
+      b.setAttribute("aria-checked", on)
+    })
+  }
+  toggle(force) {
+    let show = force === undefined ? this.el.hidden : force
+    this.el.hidden = !show
+    if (show) this.onModeChange()
+    else if (this.el.contains(document.activeElement)) document.activeElement.blur()
+  }
+}
+
 // Setup audio
 let audio = null
 
@@ -2065,16 +2295,24 @@ let start = () => {
   initSystem(iGrid, vGrid, wGrid)
   initParticles(iGrid, vGrid, wGrid)
   physicsAccumulatorMs = 0 // discard any pending catch-up steps computed under the previous mode's params
+  if (audioMixer) audioMixer.onModeChange()
 }
+let audioMixer = null
 start()
+audioMixer = new AudioMixerPanel()
 
 // One fixed-size physics tick, always using PHYSICS_STEP_MS regardless of render frame rate
 let stepPhysics = () => {
   // Update particles (and audio metrics)
   audioMetrics.particlesTotalSpeed = 0
+  audioMetrics.particlesLeftSpeed = 0
+  audioMetrics.particlesRightSpeed = 0
+  const halfW = simW / 2
   particles.forEach(p => {
     p.interact()
     audioMetrics.particlesTotalSpeed += p.speed
+    if (p.x < halfW) audioMetrics.particlesLeftSpeed += p.speed
+    else audioMetrics.particlesRightSpeed += p.speed
   })
   
   // Update system grids
